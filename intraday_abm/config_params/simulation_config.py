@@ -25,7 +25,7 @@ class SimulationConfig:
     max_volume: float = 10.0
 
     # Anzahl Random-Liquidity-Agenten
-    n_random_agents: int = 20
+    n_random_agents: int = 40
 
     # Trend-Agent verwenden?
     use_trend_agent: bool = True
