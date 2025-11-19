@@ -1,19 +1,25 @@
-"""
-Einstiegspunkt, um die Simulation direkt in VS Code auszuführen.
-"""
-
 from collections import Counter
+import os
 
 from intraday_abm.sim.simulation import run_demo
 from intraday_abm.config_params import DEFAULT_CONFIG
+from intraday_abm.sim.export_utils import save_log_to_csv
 
+"""
+Einstiegspunkt, um die Simulation direkt in VS Code auszuführen.
+Erzeugt:
+- Konsolen-Summary
+- CSV-Log unter ./results/
+"""
 
 if __name__ == "__main__":
     # Konfiguration vollständig aus config_params übernehmen
     config = DEFAULT_CONFIG
 
+    # Simulation ausführen
     log, mo = run_demo(config)
 
+    # === Summary berechnen ===
     n_steps = len(log["t"])
     total_trades = sum(log["trades"])
     avg_book_size = sum(log["book_size"]) / n_steps
@@ -46,3 +52,11 @@ if __name__ == "__main__":
     print(f"Gesamtzahl Agenten:          {len(agent_types)}")
     for agent_type, count in type_counts.items():
         print(f"  {agent_type}: {count}")
+
+    # === CSV-Export ===
+    results_dir = "results"
+    filename = f"sim_log_seed_{config.seed}.csv"
+    csv_path = os.path.join(results_dir, filename)
+
+    save_log_to_csv(log, csv_path)
+    print(f"\nLog als CSV gespeichert unter: {csv_path}")
