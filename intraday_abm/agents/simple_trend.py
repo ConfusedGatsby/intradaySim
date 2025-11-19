@@ -11,34 +11,28 @@ from intraday_abm.core.order import Order
 @dataclass
 class SimpleTrendAgent(Agent):
     """
-    Sehr einfacher, heuristischer Agent, der auf Preis-Trends reagiert.
-    Ebenfalls nur als Platzhalter-Agent gedacht, nicht als Shinde-Agent.
+    Heuristischer Agent, der auf einfache Preis-Trends reagiert.
 
-    Idee:
-    - Wenn letzter Midprice steigt, eher SELL.
-    - Wenn letzter Midprice fällt, eher BUY.
-    - Wenn keine Info vorhanden, zufällig.
+    Zweck:
+    - demonstriert, wie ein Agent PublicInfo nutzt
+    - nicht als finale, ökonomisch fundierte Strategie gedacht
     """
-
     last_midprice: Optional[float] = field(default=None, repr=False)
     base_volume: float = 5.0
 
     def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order]:
-        best_bid = public_info.best_bid
-        best_ask = public_info.best_ask
+        """Kauft bei fallenden und verkauft bei steigenden Midprices."""
+        bb = public_info.best_bid
+        ba = public_info.best_ask
 
-        # Kein TOB -> keine Entscheidung
-        if best_bid is None and best_ask is None:
+        if bb is None and ba is None:
             return None
 
-        # Midprice, falls möglich
-        if best_bid is not None and best_ask is not None:
-            mid = 0.5 * (best_bid + best_ask)
+        if bb is not None and ba is not None:
+            mid = 0.5 * (bb + ba)
         else:
-            # fallback: nutze die existierende Seite
-            mid = best_bid if best_bid is not None else best_ask
+            mid = bb if bb is not None else ba
 
-        # Trendbewertung
         if self.last_midprice is None:
             trend = 0.0
         else:
@@ -46,17 +40,13 @@ class SimpleTrendAgent(Agent):
 
         self.last_midprice = mid
 
-        # Trend > 0 => Preise steigen => eher verkaufen
-        # Trend < 0 => Preise fallen => eher kaufen
         if trend > 0:
             side = Side.SELL
         elif trend < 0:
             side = Side.BUY
         else:
-            # neutral -> zufällige Entscheidung
             side = self.rng.choice([Side.BUY, Side.SELL])
 
-        # Einfache Preiswahl in Nähe des Midprice
         price_spread = 2.0
         if side == Side.BUY:
             price = mid - self.rng.uniform(0.0, price_spread)
@@ -75,8 +65,8 @@ class SimpleTrendAgent(Agent):
         )
 
     @classmethod
-    def create(cls, id: int, rng, capacity: float,
-               base_volume: float = 5.0) -> "SimpleTrendAgent":
+    def create(cls, id: int, rng, capacity: float, base_volume: float = 5.0) -> "SimpleTrendAgent":
+        """Convenience-Factory zum Erzeugen mit AgentPrivateInfo."""
         priv = AgentPrivateInfo(capacity=capacity)
         return cls(
             id=id,

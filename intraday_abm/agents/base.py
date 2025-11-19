@@ -12,11 +12,11 @@ from intraday_abm.core.order import Order
 @dataclass
 class Agent(ABC):
     """
-    Basisklasse für alle Agenten im Intraday-Marktmodell.
+    Abstrakte Basisklasse für alle Agenten.
 
-    - Hält eine ID und private Information (Kapazität etc.).
-    - Bekommt pro Entscheidungsschritt nur PublicInfo (TOB + DA-Preis).
-    - Die konkrete Strategie wird in Subklassen implementiert.
+    - hält eine Agenten-ID
+    - besitzt private Informationen (z.B. Kapazität)
+    - trifft Entscheidungen nur auf Basis von PublicInfo + eigener PrivateInfo
     """
     id: int
     private_info: AgentPrivateInfo
@@ -25,9 +25,9 @@ class Agent(ABC):
     @abstractmethod
     def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order]:
         """
-        Trifft eine Handelsentscheidung zum Zeitpunkt t auf Basis von
-        öffentlicher Information (TOB + DA-Preis) und eigener privater Information.
+        Trifft zum Zeitpunkt t eine Handelsentscheidung.
 
-        Gibt eine neue Order zurück oder None, wenn keine Order platziert werden soll.
+        Gibt eine neue Order zurück oder None, wenn der Agent in diesem
+        Zeitschritt nicht aktiv ist.
         """
         ...

@@ -1,5 +1,5 @@
 """
-Wrapper, um die Simulation direkt per 'Run Python File' in VS Code zu starten.
+Einstiegspunkt, um die Simulation direkt in VS Code auszuführen.
 """
 
 from collections import Counter
@@ -9,15 +9,11 @@ from intraday_abm.config_params import DEFAULT_CONFIG
 
 
 if __name__ == "__main__":
-
-    # ---- WICHTIG ----
-    # Wir verwenden AB JETZT ausschließlich die Config aus config_params.
+    # Konfiguration vollständig aus config_params übernehmen
     config = DEFAULT_CONFIG
 
-    # Simulation starten
     log, mo = run_demo(config)
 
-    # Summary berechnen
     n_steps = len(log["t"])
     total_trades = sum(log["trades"])
     avg_book_size = sum(log["book_size"]) / n_steps
@@ -28,16 +24,13 @@ if __name__ == "__main__":
         if non_null_spreads else None
     )
 
-    # Agenten-Zusammenstellung basierend auf Config
-    agent_types = []
-
+    # Agentenzusammensetzung aus Config
+    agent_types: list[str] = []
     if config.n_random_agents > 0:
         agent_types += ["RandomLiquidityAgent"] * config.n_random_agents
-
     if config.use_trend_agent:
         agent_types.append("SimpleTrendAgent")
 
-    agent_count = len(agent_types)
     type_counts = Counter(agent_types)
 
     print("\n=== Simulation Summary ===")
@@ -50,6 +43,6 @@ if __name__ == "__main__":
         print("Ø Spread (Bid/Ask):          n/a (nie beidseitig)")
 
     print("\n--- Agenten im Modell ---")
-    print(f"Gesamtzahl Agenten:          {agent_count}")
+    print(f"Gesamtzahl Agenten:          {len(agent_types)}")
     for agent_type, count in type_counts.items():
         print(f"  {agent_type}: {count}")

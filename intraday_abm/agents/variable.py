@@ -11,23 +11,19 @@ from intraday_abm.core.order import Order
 @dataclass
 class VariableAgent(Agent):
     """
-    Skeleton für einen variablen Agenten (z.B. Wind/PV-Erzeuger).
-    Angelehnt an Shinde: besitzt private Forecast-Information etc.
+    Skeleton für einen variablen Agenten (z.B. Wind/PV).
 
-    Aktuell ist die Strategie ein Platzhalter (gibt None zurück).
-    Die konkrete Entscheidungslogik wird später (textnah) aus Shinde übernommen.
+    Aktuell keine Strategie implementiert.
+    Später können Forecast-Profile und Imbalance-Information ergänzt werden.
     """
 
-    # Platzhalter für spätere Erweiterungen, z.B.:
-    # forecast: list[float] | None = None
-    # forecast_error: float = 0.0
-
     def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order]:
-        # TODO: Shinde-nahe Entscheidungslogik implementieren
+        """Derzeit keine Handelsaktivität (wird später implementiert)."""
         return None
 
     @classmethod
     def create(cls, id: int, rng, capacity: float) -> "VariableAgent":
+        """Convenience-Factory zum Erzeugen mit AgentPrivateInfo."""
         priv = AgentPrivateInfo(capacity=capacity)
         return cls(
             id=id,

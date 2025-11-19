@@ -12,22 +12,21 @@ from ..config_params import SimulationConfig, DEFAULT_CONFIG
 
 def run_demo(config: SimulationConfig | None = None):
     """
-    Führt eine Simulation mit der gegebenen Konfiguration aus.
-    Wenn keine Konfiguration übergeben wird -> DEFAULT_CONFIG.
-    """
+    Führt eine Intraday-Simulation mit gegebener Konfiguration aus.
 
-    # 1) Konfiguration laden
+    Kernidee:
+    - MarketOperator + OrderBook
+    - mehrere Agenten, die in jedem Zeitschritt Orders platzieren
+    - Shinde-nahes Verhalten: Cancel-First + PublicInfo (TOB + DA-Preis)
+    """
     if config is None:
         config = DEFAULT_CONFIG
 
-    # 2) RNG (reproduzierbar)
     rng = random.Random(config.seed)
 
-    # 3) Marktkomponenten
-    ob = OrderBook(product_id=0)
-    mo = MarketOperator(order_book=ob)
+    order_book = OrderBook(product_id=0)
+    mo = MarketOperator(order_book=order_book)
 
-    # 4) Agenten erstellen
     agents: list = []
 
     # Random-Liquidity-Agents
@@ -53,7 +52,7 @@ def run_demo(config: SimulationConfig | None = None):
         )
         agents.append(trend_agent)
 
-    # 5) Logging vorbereiten
+    # Log-Struktur
     log = {
         "t": [],
         "best_bid": [],
@@ -64,44 +63,35 @@ def run_demo(config: SimulationConfig | None = None):
         "trades": [],
     }
 
-    # 6) Haupt-Simulationsloop
+    # Hauptloop
     for t in range(config.n_steps):
-
         trades_this_step = 0
 
-        # Zufällige Auswahl aktiver Agents
+        # zufällige Auswahl aktiver Agenten
         n_active = rng.randint(1, len(agents))
         active_agents = rng.sample(agents, n_active)
 
-        # --- Agentenaktionen ---
         for agent in active_agents:
-
-            # Shinde-nah: vorher alle eigenen Orders löschen
+            # Shinde-nah: zuerst eigene Orders canceln
             mo.cancel_agent_orders(agent.id)
 
-            # TOB auslesen
             tob = mo.get_tob()
-
-            # PublicInfo erzeugen (Shinde: public info = TOB + DA-Preis)
             public_info = PublicInfo(
                 best_bid=tob["best_bid_price"],
                 best_ask=tob["best_ask_price"],
                 da_price=config.da_price,
             )
 
-            # Agent entscheidet
             order = agent.decide_order(t, public_info)
 
             if order is not None:
                 trades = mo.process_order(order, time=t)
                 trades_this_step += len(trades)
 
-        # --- Nach allen Orders: aktueller Marktstatus ---
         tob_end = mo.get_tob()
         bb = tob_end["best_bid_price"]
         ba = tob_end["best_ask_price"]
 
-        # Midprice & Spread
         if bb is not None and ba is not None:
             mid = 0.5 * (bb + ba)
             spread = ba - bb
@@ -109,7 +99,6 @@ def run_demo(config: SimulationConfig | None = None):
             mid = None
             spread = None
 
-        # Logging
         log["t"].append(t)
         log["best_bid"].append(bb)
         log["best_ask"].append(ba)
@@ -118,17 +107,14 @@ def run_demo(config: SimulationConfig | None = None):
         log["book_size"].append(len(mo.order_book))
         log["trades"].append(trades_this_step)
 
-        # Debug-Ausgabe
         print(
             f"[t={t}] TOB bid: {bb} ask: {ba} "
             f"mid: {mid} spread: {spread} "
             f"book_size: {len(mo.order_book)} trades: {trades_this_step}"
         )
 
-    # 7) Rückgabe: Log + MarketOperator (Orderbuch etc.)
     return log, mo
 
 
-# Ermöglicht "python -m intraday_abm.sim.simulation"
 if __name__ == "__main__":
     run_demo()

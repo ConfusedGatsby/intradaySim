@@ -12,23 +12,18 @@ from intraday_abm.core.order import Order
 class DispatchableAgent(Agent):
     """
     Skeleton für einen dispatchbaren Agenten (z.B. konventionelles Kraftwerk).
-    Angelehnt an Shinde: hat private Kapazitäts- und Kosteninformationen.
 
-    Aktuell ist die Strategie ein Platzhalter (gibt None zurück).
-    Die konkrete Entscheidungslogik wird später (textnah) aus Shinde übernommen.
+    Aktuell gibt die Strategie keine Orders zurück (Stub).
+    Dient als strukturelle Vorbereitung für eine spätere Shinde-nahe Implementierung.
     """
 
-    # Platzhalter für spätere Erweiterungen, z.B.:
-    # marginal_cost: float = 50.0
-    # ramp_limit: float = 10.0
-
     def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order]:
-        # TODO: Shinde-nahe Entscheidungslogik implementieren
-        # Aktuell kein Handel -> None
+        """Derzeit keine Handelsaktivität (wird später implementiert)."""
         return None
 
     @classmethod
     def create(cls, id: int, rng, capacity: float) -> "DispatchableAgent":
+        """Convenience-Factory zum Erzeugen mit AgentPrivateInfo."""
         priv = AgentPrivateInfo(capacity=capacity)
         return cls(
             id=id,
