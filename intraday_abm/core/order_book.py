@@ -1,57 +1,94 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Dict, Optional
+from collections import defaultdict
 
-from .order import Order
-from .types import Side
+from intraday_abm.core.order import Order
+from intraday_abm.core.types import Side
 
 
 @dataclass
 class OrderBook:
     """
-    Einfaches Limit Order Book für ein Produkt.
+    Einfaches Orderbuch mit Price-Time-Priority (FIFO je Preislevel).
 
-    Bids und Asks werden als Listen von Orders gehalten und nach
-    Preis-Time-Priority sortiert:
-    - beste Bid = höchster Preis, bei Gleichstand ältere Order zuerst
-    - beste Ask = niedrigster Preis, bei Gleichstand ältere Order zuerst
+    Datenstruktur:
+    - bids: Dict[price -> List[Order]] (höchster Preis zuerst)
+    - asks: Dict[price -> List[Order]] (niedrigster Preis zuerst)
     """
     product_id: int
-    bids: List[Order] = field(default_factory=list)
-    asks: List[Order] = field(default_factory=list)
+    bids: Dict[float, List[Order]] = field(default_factory=lambda: defaultdict(list))
+    asks: Dict[float, List[Order]] = field(default_factory=lambda: defaultdict(list))
 
-    def __len__(self) -> int:
-        """Anzahl noch offener Orders im Buch."""
-        return len(self.bids) + len(self.asks)
-
+    # ---------------------------------------------------------
+    # ORDER HINZUFÜGEN
+    # ---------------------------------------------------------
     def add_order(self, order: Order) -> None:
-        """
-        Fügt eine neue Order ins Buch ein und sortiert nach Price-Time-Priority.
-        """
-        book_side = self.bids if order.side == Side.BUY else self.asks
-        book_side.append(order)
-
+        """Legt eine Order in das Orderbuch (entsprechendes Preislevel)."""
         if order.side == Side.BUY:
-            # zuerst nach Preis absteigend, dann Zeit aufsteigend
-            book_side.sort(key=lambda o: (-o.price, o.time))
+            self.bids[order.price].append(order)
         else:
-            # zuerst nach Preis aufsteigend, dann Zeit aufsteigend
-            book_side.sort(key=lambda o: (o.price, o.time))
+            self.asks[order.price].append(order)
 
+    # ---------------------------------------------------------
+    # ORDER ENTFERNEN
+    # ---------------------------------------------------------
+    def remove_order(self, order: Order) -> None:
+        """Entfernt eine konkrete Order aus dem jeweiligen Preislevel."""
+        book = self.bids if order.side == Side.BUY else self.asks
+        level = book.get(order.price, [])
+        if order in level:
+            level.remove(order)
+        if not level:
+            del book[order.price]
+
+    # ---------------------------------------------------------
+    # A2: ENTFERNEN ALLER ORDERS EINES AGENTEN
+    # ---------------------------------------------------------
+    def remove_orders_by_agent(self, agent_id: int) -> None:
+        """
+        Entfernt ALLE offenen Orders eines Agenten aus dem Orderbuch.
+        Wird in A2 benötigt, weil in jedem Schritt 'cancel-first' erfolgt.
+        """
+        # BIDS
+        for price in list(self.bids.keys()):
+            new_list = [o for o in self.bids[price] if o.agent_id != agent_id]
+            if new_list:
+                self.bids[price] = new_list
+            else:
+                del self.bids[price]
+
+        # ASKS
+        for price in list(self.asks.keys()):
+            new_list = [o for o in self.asks[price] if o.agent_id != agent_id]
+            if new_list:
+                self.asks[price] = new_list
+            else:
+                del self.asks[price]
+
+    # ---------------------------------------------------------
+    # TOP-OF-BOOK
+    # ---------------------------------------------------------
     def best_bid(self) -> Optional[Order]:
-        """Gibt die beste Bid-Order zurück oder None, falls keine vorhanden ist."""
-        return self.bids[0] if self.bids else None
+        """Gibt die beste (höchste Preis) BUY-Order zurück."""
+        if not self.bids:
+            return None
+        best_price = max(self.bids.keys())
+        level = self.bids[best_price]
+        return level[0] if level else None
 
     def best_ask(self) -> Optional[Order]:
-        """Gibt die beste Ask-Order zurück oder None, falls keine vorhanden ist."""
-        return self.asks[0] if self.asks else None
+        """Gibt die beste (niedrigste Preis) SELL-Order zurück."""
+        if not self.asks:
+            return None
+        best_price = min(self.asks.keys())
+        level = self.asks[best_price]
+        return level[0] if level else None
 
-    def remove_order(self, order: Order) -> None:
-        """Entfernt eine Order aus dem Buch, falls vorhanden."""
-        book_side = self.bids if order.side == Side.BUY else self.asks
-        try:
-            book_side.remove(order)
-        except ValueError:
-            # Wenn die Order nicht gefunden wird, ignorieren wir das still.
-            pass
+    # ---------------------------------------------------------
+    # LENGTH / SIZE
+    # ---------------------------------------------------------
+    def __len__(self) -> int:
+        """Gesamtzahl offener Orders im Buch."""
+        return sum(len(v) for v in self.bids.values()) + sum(len(v) for v in self.asks.values())
