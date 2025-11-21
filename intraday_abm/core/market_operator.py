@@ -1,128 +1,154 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Dict, Optional
+from typing import List
 
-from .order_book import OrderBook
-from .order import Order
-from .types import Side, TimeInForce
-
-
-@dataclass
-class Trade:
-    """
-    Ausgeführter Handel zwischen einer Bid- und einer Ask-Order.
-    """
-    price: float
-    volume: float
-    buy_order_id: int
-    sell_order_id: int
-    time: int
+from intraday_abm.core.order_book import OrderBook
+from intraday_abm.core.order import Order, Trade
+from intraday_abm.core.types import Side
 
 
 @dataclass
 class MarketOperator:
     """
-    Zentraler Market Operator (MO).
-
-    Verantwortlichkeiten:
-    - Verwaltung des Orderbuchs
-    - Vergabe von Order-IDs
-    - Matching eingehender Orders gegen das Buch
-    - Einhalten von Price-Time-Priority und Pay-as-Bid
+    Verwaltet das Orderbuch und führt Matching aus (Pay-as-Bid, Price-Time-Priority).
     """
     order_book: OrderBook
-    _next_order_id: int = 1
+    next_order_id: int = 1
 
-    def _assign_order_id(self, order: Order) -> None:
-        """Vergibt eine eindeutige Order-ID, falls noch keine gesetzt ist."""
-        if order.id < 0:
-            order.id = self._next_order_id
-            self._next_order_id += 1
+    def _assign_order_id(self, order: Order, time: int) -> Order:
+        order.id = self.next_order_id
+        self.next_order_id += 1
+        order.timestamp = time
+        return order
+
+    # Öffentliche API ---------------------------------------------------------
 
     def process_order(self, order: Order, time: int) -> List[Trade]:
         """
-        Verarbeitet eine eingehende Order:
-        - vergibt ID und Zeit
-        - matched gegen Gegenseite (Price-Time-Priority, Pay-as-Bid)
-        - fügt Restvolumen ggf. ins Buch ein (bei GTC)
+        Nimmt eine neue Order entgegen, weist eine ID zu und matched diese
+        gegen das bestehende Orderbuch.
         """
-        self._assign_order_id(order)
-        order.time = time
+        self._assign_order_id(order, time)
 
-        trades: List[Trade] = []
-
-        # Bestimme Gegenseite
-        book = self.order_book
         if order.side == Side.BUY:
-            opposite = book.asks
-            same_side = book.bids
+            trades = self._match_buy(order, time)
         else:
-            opposite = book.bids
-            same_side = book.asks
+            trades = self._match_sell(order, time)
 
-        # Matching-Schleife, solange Crossing möglich ist
-        while opposite and order.volume > 0:
-            best = opposite[0]
-
-            # Preis-Crossing-Bedingung
-            if order.side == Side.BUY and order.price < best.price:
-                break
-            if order.side == Side.SELL and order.price > best.price:
-                break
-
-            # Pay-as-Bid: Preis der liegenden Order
-            trade_price = best.price
-            traded_volume = min(order.volume, best.volume)
-
-            trades.append(
-                Trade(
-                    price=trade_price,
-                    volume=traded_volume,
-                    buy_order_id=order.id if order.side == Side.BUY else best.id,
-                    sell_order_id=order.id if order.side == Side.SELL else best.id,
-                    time=time,
-                )
-            )
-
-            # Volumen anpassen
-            order.volume -= traded_volume
-            best.volume -= traded_volume
-
-            # Voll gefüllte Gegenseite aus dem Buch entfernen
-            if best.volume <= 0:
-                opposite.pop(0)
-
-        # Restvolumen bei GTC ins Buch einstellen
-        if order.volume > 0 and order.tif == TimeInForce.GTC:
-            book.add_order(order)
+        # Falls noch Restvolumen vorhanden ist und GTC: ins Buch legen
+        if order.volume > 0 and order.time_in_force is not None:
+            from intraday_abm.core.types import TimeInForce  # vermeiden von Zyklusimport
+            if order.time_in_force == TimeInForce.GTC:
+                self.order_book.add_order(order)
 
         return trades
 
     def cancel_agent_orders(self, agent_id: int) -> None:
         """
-        Löscht alle Orders eines Agenten aus dem Orderbuch.
-        Shinde-nah: Agent cancelt vor dem Platzieren neuer Orders.
+        Löscht alle offenen Orders eines Agenten aus dem Orderbuch.
         """
-        bids = self.order_book.bids
-        asks = self.order_book.asks
+        self.order_book.remove_orders_by_agent(agent_id)
 
-        self.order_book.bids = [o for o in bids if o.agent_id != agent_id]
-        self.order_book.asks = [o for o in asks if o.agent_id != agent_id]
-
-    def get_tob(self) -> Dict[str, Optional[float]]:
+    def get_tob(self) -> dict:
         """
-        Gibt ein einfaches Top-of-Book-Objekt zurück:
-        - beste Bid/Ask-Preise
-        (optional erweiterbar um Volumen/VWAP, falls benötigt)
+        Gibt das aktuelle Top-of-Book als Dict zurück:
+        {
+            "best_bid_price": float | None,
+            "best_ask_price": float | None
+        }
         """
         best_bid = self.order_book.best_bid()
         best_ask = self.order_book.best_ask()
+
         return {
             "best_bid_price": best_bid.price if best_bid else None,
             "best_ask_price": best_ask.price if best_ask else None,
         }
 
-    def __len__(self) -> int:
-        """Anzahl offener Orders im Orderbuch."""
-        return len(self.order_book)
+    # Interne Matching-Logik --------------------------------------------------
+
+    def _match_buy(self, incoming: Order, time: int) -> List[Trade]:
+        """
+        Matching für eingehende Kauforder (BUY).
+
+        - matched gegen beste Asks
+        - Preis = Preis der liegenden Order (Pay-as-Bid)
+        - FIFO innerhalb eines Preislevels (durch OrderBook sichergestellt)
+        """
+        trades: List[Trade] = []
+
+        while incoming.volume > 0:
+            best_ask = self.order_book.best_ask()
+            if best_ask is None:
+                break
+
+            # Crossing-Bedingung: Buy-Preis >= Ask-Preis
+            if incoming.price < best_ask.price:
+                break
+
+            traded_volume = min(incoming.volume, best_ask.volume)
+            trade_price = best_ask.price  # Pay-as-Bid -> Preis der liegenden Order
+
+            # Trade-Objekt mit Order- und Agent-IDs
+            tr = Trade(
+                price=trade_price,
+                volume=traded_volume,
+                buy_order_id=incoming.id,
+                sell_order_id=best_ask.id,
+                buy_agent_id=incoming.agent_id,
+                sell_agent_id=best_ask.agent_id,
+                time=time,
+            )
+            trades.append(tr)
+
+            # Volumen anpassen
+            incoming.volume -= traded_volume
+            best_ask.volume -= traded_volume
+
+            # Liegende Order ggf. entfernen
+            if best_ask.volume <= 0:
+                self.order_book.remove_order(best_ask)
+
+        return trades
+
+    def _match_sell(self, incoming: Order, time: int) -> List[Trade]:
+        """
+        Matching für eingehende Verkauforder (SELL).
+
+        - matched gegen beste Bids
+        - Preis = Preis der liegenden Order (Pay-as-Bid)
+        - FIFO innerhalb eines Preislevels (durch OrderBook sichergestellt)
+        """
+        trades: List[Trade] = []
+
+        while incoming.volume > 0:
+            best_bid = self.order_book.best_bid()
+            if best_bid is None:
+                break
+
+            # Crossing-Bedingung: Sell-Preis <= Bid-Preis
+            if incoming.price > best_bid.price:
+                break
+
+            traded_volume = min(incoming.volume, best_bid.volume)
+            trade_price = best_bid.price  # Pay-as-Bid -> Preis der liegenden Order
+
+            tr = Trade(
+                price=trade_price,
+                volume=traded_volume,
+                buy_order_id=best_bid.id,
+                sell_order_id=incoming.id,
+                buy_agent_id=best_bid.agent_id,
+                sell_agent_id=incoming.agent_id,
+                time=time,
+            )
+            trades.append(tr)
+
+            incoming.volume -= traded_volume
+            best_bid.volume -= traded_volume
+
+            if best_bid.volume <= 0:
+                self.order_book.remove_order(best_bid)
+
+        return trades
