@@ -14,7 +14,7 @@ class SimpleTrendAgent(Agent):
     Heuristischer Agent, der auf einfache Preis-Trends reagiert.
 
     Zweck:
-    - demonstriert, wie ein Agent PublicInfo nutzt
+    - demonstriert, wie ein Agent PublicInfo (TOB + DA-Preis) nutzt
     - nicht als finale, ökonomisch fundierte Strategie gedacht
     """
     last_midprice: Optional[float] = field(default=None, repr=False)
@@ -22,8 +22,8 @@ class SimpleTrendAgent(Agent):
 
     def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order]:
         """Kauft bei fallenden und verkauft bei steigenden Midprices."""
-        bb = public_info.best_bid
-        ba = public_info.best_ask
+        bb = public_info.tob.best_bid_price
+        ba = public_info.tob.best_ask_price
 
         if bb is None and ba is None:
             return None
@@ -67,7 +67,7 @@ class SimpleTrendAgent(Agent):
     @classmethod
     def create(cls, id: int, rng, capacity: float, base_volume: float = 5.0) -> "SimpleTrendAgent":
         """Convenience-Factory zum Erzeugen mit AgentPrivateInfo."""
-        priv = AgentPrivateInfo(capacity=capacity)
+        priv = AgentPrivateInfo(effective_capacity=capacity)
         return cls(
             id=id,
             private_info=priv,

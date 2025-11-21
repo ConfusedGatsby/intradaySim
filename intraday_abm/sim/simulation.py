@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import random
 
-from ..core.order_book import OrderBook
-from ..core.market_operator import MarketOperator
-from ..core.types import PublicInfo
-from ..agents.random_liquidity import RandomLiquidityAgent
-from ..agents.simple_trend import SimpleTrendAgent
-from ..config_params import SimulationConfig, DEFAULT_CONFIG
+from intraday_abm.core.order_book import OrderBook
+from intraday_abm.core.market_operator import MarketOperator
+from intraday_abm.core.types import PublicInfo, TopOfBook
+from intraday_abm.agents.random_liquidity import RandomLiquidityAgent
+from intraday_abm.agents.simple_trend import SimpleTrendAgent
+from intraday_abm.config_params import SimulationConfig, DEFAULT_CONFIG
 
 
 def run_demo(config: SimulationConfig | None = None):
@@ -24,6 +24,7 @@ def run_demo(config: SimulationConfig | None = None):
 
     rng = random.Random(config.seed)
 
+    # Ein Orderbuch für ein Produkt (product_id = 0)
     order_book = OrderBook(product_id=0)
     mo = MarketOperator(order_book=order_book)
 
@@ -67,27 +68,38 @@ def run_demo(config: SimulationConfig | None = None):
     for t in range(config.n_steps):
         trades_this_step = 0
 
-        # zufällige Auswahl aktiver Agenten
+        # zufällige Auswahl aktiver Agenten (vereinfacht)
         n_active = rng.randint(1, len(agents))
         active_agents = rng.sample(agents, n_active)
 
         for agent in active_agents:
+
             # Shinde-nah: zuerst eigene Orders canceln
             mo.cancel_agent_orders(agent.id)
 
-            tob = mo.get_tob()
+            # TOB holen
+            tob_raw = mo.get_tob()
+            tob = TopOfBook(
+                best_bid_price=tob_raw["best_bid_price"],
+                best_bid_volume=None,   # aktuell noch nicht im Modell enthalten
+                best_ask_price=tob_raw["best_ask_price"],
+                best_ask_volume=None,   # optional für spätere Erweiterung
+            )
+
+            # Public Info
             public_info = PublicInfo(
-                best_bid=tob["best_bid_price"],
-                best_ask=tob["best_ask_price"],
+                tob=tob,
                 da_price=config.da_price,
             )
 
+            # Order-Entscheidung
             order = agent.decide_order(t, public_info)
 
             if order is not None:
                 trades = mo.process_order(order, time=t)
                 trades_this_step += len(trades)
 
+        # --- Logging ---
         tob_end = mo.get_tob()
         bb = tob_end["best_bid_price"]
         ba = tob_end["best_ask_price"]

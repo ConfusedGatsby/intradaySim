@@ -46,7 +46,7 @@ class RandomLiquidityAgent(Agent):
         max_volume: float,
     ) -> "RandomLiquidityAgent":
         """Convenience-Factory zum Erzeugen mit AgentPrivateInfo."""
-        priv = AgentPrivateInfo(capacity=capacity)
+        priv = AgentPrivateInfo(effective_capacity=capacity)
         return cls(
             id=id,
             private_info=priv,

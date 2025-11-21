@@ -14,9 +14,9 @@ class Agent(ABC):
     """
     Abstrakte Basisklasse für alle Agenten.
 
-    - hält eine Agenten-ID
-    - besitzt private Informationen (z.B. Kapazität)
-    - trifft Entscheidungen nur auf Basis von PublicInfo + eigener PrivateInfo
+    - id: eindeutige Agenten-ID
+    - private_info: enthält Kapazität, Position, Erlöse, Imbalance etc.
+    - rng: Agent-lokaler Zufallszahlengenerator
     """
     id: int
     private_info: AgentPrivateInfo
@@ -26,8 +26,6 @@ class Agent(ABC):
     def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order]:
         """
         Trifft zum Zeitpunkt t eine Handelsentscheidung.
-
-        Gibt eine neue Order zurück oder None, wenn der Agent in diesem
-        Zeitschritt nicht aktiv ist.
+        Gibt eine Order zurück oder None (keine Aktivität in diesem Schritt).
         """
         ...
