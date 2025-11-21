@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from random import Random
 from typing import Optional
 
-from intraday_abm.core.types import PublicInfo, AgentPrivateInfo
+from intraday_abm.core.types import PublicInfo, AgentPrivateInfo, Side
 from intraday_abm.core.order import Order
 
 
@@ -29,3 +29,20 @@ class Agent(ABC):
         Gibt eine Order zurück oder None (keine Aktivität in diesem Schritt).
         """
         ...
+
+    def on_trade(self, volume: float, price: float, side: Side) -> None:
+        """
+        Aktualisiert Marktposition und Erlöse nach einem Trade.
+
+        Orientierung an Shinde:
+        - market_position p_mar erhöht sich bei Verkäufen, verringert sich bei Käufen
+        - revenue r_i,t steigt bei Verkäufen und fällt bei Käufen
+        """
+        if side == Side.SELL:
+            # Verkauft: Position steigt, Erlöse steigen
+            self.private_info.market_position += volume
+            self.private_info.revenue += volume * price
+        else:  # BUY
+            # Gekauft: Position sinkt, „Erlös“ wird negativer (Kosten)
+            self.private_info.market_position -= volume
+            self.private_info.revenue -= volume * price
