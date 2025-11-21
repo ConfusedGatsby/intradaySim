@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import random
+from collections import Counter
 
 from intraday_abm.core.order_book import OrderBook
 from intraday_abm.core.market_operator import MarketOperator
-from intraday_abm.core.types import PublicInfo, TopOfBook
+from intraday_abm.core.types import PublicInfo, TopOfBook, Side
 from intraday_abm.agents.random_liquidity import RandomLiquidityAgent
 from intraday_abm.agents.simple_trend import SimpleTrendAgent
 from intraday_abm.config_params import SimulationConfig, DEFAULT_CONFIG
@@ -18,6 +19,7 @@ def run_demo(config: SimulationConfig | None = None):
     - MarketOperator + OrderBook
     - mehrere Agenten, die in jedem Zeitschritt Orders platzieren
     - Shinde-nahes Verhalten: Cancel-First + PublicInfo (TOB + DA-Preis)
+    - NEU (A2): Agenten-Marktposition und Erlöse werden nach Trades aktualisiert
     """
     if config is None:
         config = DEFAULT_CONFIG
@@ -52,6 +54,9 @@ def run_demo(config: SimulationConfig | None = None):
             base_volume=5.0,
         )
         agents.append(trend_agent)
+
+    # Map von Agent-ID auf Agent-Objekt (für A2 notwendig)
+    agent_by_id = {ag.id: ag for ag in agents}
 
     # Log-Struktur
     log = {
@@ -98,6 +103,15 @@ def run_demo(config: SimulationConfig | None = None):
             if order is not None:
                 trades = mo.process_order(order, time=t)
                 trades_this_step += len(trades)
+
+                # NEU (A2): Trades an beteiligte Agenten zurückmelden
+                for tr in trades:
+                    buyer = agent_by_id.get(tr.buy_agent_id)
+                    seller = agent_by_id.get(tr.sell_agent_id)
+                    if buyer is not None:
+                        buyer.on_trade(tr.volume, tr.price, side=Side.BUY)
+                    if seller is not None:
+                        seller.on_trade(tr.volume, tr.price, side=Side.SELL)
 
         # --- Logging ---
         tob_end = mo.get_tob()
