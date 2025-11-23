@@ -5,7 +5,8 @@ Einstiegspunkt für die Intraday-ABM-Simulation.
 
 - Lädt eine SimulationConfig
 - Führt run_demo() aus
-- Speichert das Log als CSV
+- Speichert das Marktlog als CSV
+- Speichert pro Agent ein eigenes CSV
 - Gibt eine kleine Zusammenfassung über Markt- und Agentenstatistiken aus
 """
 
@@ -17,6 +18,7 @@ from typing import Dict, Any, List
 from intraday_abm.config_params import DEFAULT_CONFIG, SimulationConfig
 from intraday_abm.sim.simulation import run_demo
 from intraday_abm.sim.export_utils import save_log_to_csv
+from intraday_abm.sim.export_agent_logs import save_agent_logs
 from intraday_abm.sim.plot_results import plot_results
 
 
@@ -60,12 +62,17 @@ def main(config: SimulationConfig | None = None) -> None:
         config = DEFAULT_CONFIG
 
     # --- Simulation ausführen ---
-    log, mo = run_demo(config)
+    log, agent_logs, mo = run_demo(config)
 
-    # --- CSV speichern ---
+    # --- Verzeichnis anlegen ---
     os.makedirs(config.results_dir, exist_ok=True)
+
+    # --- Markt-CSV speichern ---
     csv_path = os.path.join(config.results_dir, config.csv_filename)
     save_log_to_csv(log, csv_path)
+
+    # --- Agenten-CSV speichern ---
+    save_agent_logs(agent_logs, config.results_dir)
 
     # --- Kennzahlen berechnen ---
     stats = _compute_summary_stats(log)
@@ -76,9 +83,7 @@ def main(config: SimulationConfig | None = None) -> None:
     print(f"Ø Orderbuchgröße:            {stats['avg_book_size']:.2f}")
     print(f"Ø Spread (Bid/Ask):          {stats['avg_spread']:.2f}")
 
-    # --- Agenten-Zusammenfassung (Bugfix) ---
-    # Bisher wurden nur Random + Trend gezählt. Jetzt zählen wir alle,
-    # basierend auf der Config (Anzahl je Typ).
+    # --- Agenten-Zusammenfassung (korrekt aus Config) ---
     n_random = config.n_random_agents
     n_dispatchable = getattr(config, "n_dispatchable_agents", 0)
     n_variable = getattr(config, "n_variable_agents", 0)
@@ -94,6 +99,7 @@ def main(config: SimulationConfig | None = None) -> None:
     print(f"  SimpleTrendAgent:     {n_trend}")
 
     print(f"\nLog als CSV gespeichert unter: {csv_path}")
+    print(f"Agenten-Logs im Ordner:        {os.path.join(config.results_dir, 'agent_logs')}")
 
     # Optional: Plot aufrufen (kannst du auskommentieren, wenn du keinen Plot willst)
     try:

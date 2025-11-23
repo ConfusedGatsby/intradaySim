@@ -26,7 +26,7 @@ def run_demo(config: SimulationConfig | None = None):
     - Shinde-nah:
       - Cancel-First pro Agent
       - PublicInfo (TOB + DA-Preis)
-      - AgentPrivateInfo mit Position/Revenue-Updates (A2)
+      - AgentPrivateInfo mit Position/Revenue-Updates
     """
     if config is None:
         config = DEFAULT_CONFIG
@@ -92,10 +92,10 @@ def run_demo(config: SimulationConfig | None = None):
         agents.append(t_ag)
         next_id += 1
 
-    # Map von Agent-ID auf Agent-Objekt (für A2 notwendig)
+    # Map von Agent-ID auf Agent-Objekt (für Trade-Callbacks)
     agent_by_id = {ag.id: ag for ag in agents}
 
-    # Log-Struktur
+    # Markt-Log (Top-of-Book etc.)
     log = {
         "t": [],
         "best_bid": [],
@@ -106,14 +106,36 @@ def run_demo(config: SimulationConfig | None = None):
         "trades": [],
     }
 
+    # Agenten-Logs: ein Dict pro Agent
+    agent_logs = {
+        ag.id: {
+            "t": [],
+            "agent_type": ag.__class__.__name__,
+            "position": [],
+            "revenue": [],
+            "imbalance": [],
+            "da_position": [],
+            "capacity": [],
+        }
+        for ag in agents
+    }
+
     # Hauptloop
     for t in range(config.n_steps):
         trades_this_step = 0
 
-        # einfache Aktivierung: alle Agents versuchen zu handeln
-        # (kann später probabilistisch gemacht werden)
-        for agent in agents:
+        # --- Agenten-Zustände vor Aktionen loggen ---
+        for ag in agents:
+            pi = ag.private_info
+            agent_logs[ag.id]["t"].append(t)
+            agent_logs[ag.id]["position"].append(pi.market_position)
+            agent_logs[ag.id]["revenue"].append(pi.revenue)
+            agent_logs[ag.id]["imbalance"].append(pi.imbalance)
+            agent_logs[ag.id]["da_position"].append(pi.da_position)
+            agent_logs[ag.id]["capacity"].append(pi.effective_capacity)
 
+        # --- Agenten handeln lassen ---
+        for agent in agents:
             # Shinde-nah: zuerst eigene Orders canceln
             mo.cancel_agent_orders(agent.id)
 
@@ -139,7 +161,7 @@ def run_demo(config: SimulationConfig | None = None):
                 trades = mo.process_order(order, time=t)
                 trades_this_step += len(trades)
 
-                # Trades an beteiligte Agenten zurückmelden (A2)
+                # Trades an beteiligte Agenten zurückmelden
                 for tr in trades:
                     buyer = agent_by_id.get(tr.buy_agent_id)
                     seller = agent_by_id.get(tr.sell_agent_id)
@@ -148,7 +170,7 @@ def run_demo(config: SimulationConfig | None = None):
                     if seller is not None:
                         seller.on_trade(tr.volume, tr.price, side=Side.SELL)
 
-        # --- Logging ---
+        # --- Markt-Logging ---
         tob_end = mo.get_tob()
         bb = tob_end["best_bid_price"]
         ba = tob_end["best_ask_price"]
@@ -174,7 +196,7 @@ def run_demo(config: SimulationConfig | None = None):
             f"book_size: {len(mo.order_book)} trades: {trades_this_step}"
         )
 
-    # Optional: kleine Zusammenfassung der Agenten am Ende
+    # Kurze Agenten-Zusammenfassung
     print("\n=== Agenten-Zusammenfassung ===")
     for ag in agents:
         pi = ag.private_info
@@ -184,7 +206,7 @@ def run_demo(config: SimulationConfig | None = None):
             f"imbalance={pi.imbalance:.2f}"
         )
 
-    return log, mo
+    return log, agent_logs, mo
 
 
 if __name__ == "__main__":
