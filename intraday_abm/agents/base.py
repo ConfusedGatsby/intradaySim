@@ -7,6 +7,7 @@ from typing import Optional
 
 from intraday_abm.core.types import PublicInfo, AgentPrivateInfo, Side
 from intraday_abm.core.order import Order
+from intraday_abm.agents.pricing_strategies import PricingStrategy
 
 
 @dataclass
@@ -17,10 +18,22 @@ class Agent(ABC):
     - id: eindeutige Agenten-ID
     - private_info: enthält Kapazität, Position, Erlöse, Imbalance etc.
     - rng: Agent-lokaler Zufallszahlengenerator
+    - pricing_strategy: optionale Preisstrategie (naiv / MTAA nach Shinde)
     """
+
     id: int
     private_info: AgentPrivateInfo
     rng: Random = field(repr=False)
+
+    # WICHTIG:
+    # - init=False → dieses Feld taucht NICHT als Parameter im __init__ auf.
+    #   Damit kollidiert es NICHT mit den Feldern der Kindklassen (DispatchableAgent etc.).
+    # - Default = None → wir können später optional eine Strategy zuweisen.
+    pricing_strategy: Optional[PricingStrategy] = field(
+        default=None,
+        repr=False,
+        init=False,
+    )
 
     @abstractmethod
     def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order]:
@@ -29,6 +42,32 @@ class Agent(ABC):
         Gibt eine Order zurück oder None (keine Aktivität in diesem Schritt).
         """
         ...
+
+    def compute_order_price(
+        self,
+        *,
+        public_info: PublicInfo,
+        side: Side,
+        volume: float,
+    ) -> float:
+        """
+        Zentraler Zugriffspunkt für Preisstrategien nach Shinde.
+
+        Falls eine PricingStrategy gesetzt ist, wird deren compute_price(...)
+        verwendet. Andernfalls wird ein einfacher Fallback genutzt
+        (derzeit: Day-Ahead-Preis).
+        """
+        if self.pricing_strategy is None:
+            # Fallback, damit existierender Code weiterläuft,
+            # solange Agenten noch nicht explizit Strategien zugewiesen bekommen.
+            return public_info.da_price
+
+        return self.pricing_strategy.compute_price(
+            agent=self,
+            public_info=public_info,
+            side=side,
+            volume=volume,
+        )
 
     def on_trade(self, volume: float, price: float, side: Side) -> None:
         """
