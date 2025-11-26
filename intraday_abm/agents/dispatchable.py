@@ -32,14 +32,18 @@ class DispatchableAgent(Agent):
       < 0  => Überlieferung (zu viel verkauft)       → eher BUY
 
     Imbalance-Kosten:
-    - private_info.imbalance_cost akkumuliert
-      imbalance_penalty * |δ_t| pro Zeitschritt.
+    - Die eigentliche finanzielle Abrechnung erfolgt zentral in der
+      Simulation (z.B. einmalig am Ende des Zeithorizonts).
+    - Diese Klasse setzt nur pi.imbalance als physisches Steuersignal.
+    - Das Feld imbalance_penalty ist aktuell nur als Konfig-Parameter
+      vorgesehen (für spätere lokale Heuristiken), wird aber NICHT
+      mehr benutzt, um Kosten aufzuräumen.
     """
 
     marginal_cost: float          # Grenzkosten [€/MWh]
     base_volume: float = 5.0      # typisches Ordervolumen
     epsilon_price: float = 1.0    # Mindest-Marge in €/MWh
-    imbalance_penalty: float = 0.0  # Strafkosten pro Einheit |δ_t|
+    imbalance_penalty: float = 0.0  # aktuell nur „Deko“, zentrale Kosten in simulation.py
 
     def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order]:
         """
@@ -77,9 +81,8 @@ class DispatchableAgent(Agent):
         imbalance = da_pos - mar_pos
         pi.imbalance = imbalance
 
-        # Imbalance-Kosten dieses Zeitschritts (nur Buchhaltung)
-        if self.imbalance_penalty != 0.0:
-            pi.imbalance_cost += self.imbalance_penalty * abs(imbalance)
+        # >>> WICHTIG: keine lokale Akkumulation von Imbalance-Kosten mehr <<<
+        # Die eigentliche Abrechnung erfolgt zentral in der Simulation.
 
         # Wie weit sind wir von der DA-Position entfernt?
         # positive Lücke: wir können noch verkaufen,
@@ -172,7 +175,8 @@ class DispatchableAgent(Agent):
 
         - capacity: effektive Kapazität C_max
         - da_position: Day-Ahead-Position p_i^{DA}
-        - imbalance_penalty: Strafkosten pro Einheit |δ_t|
+        - imbalance_penalty: (derzeit ungenutzt in der Agentenlogik,
+          Abrechnung der Imbalance-Kosten erfolgt zentral in simulation.py)
         """
         priv = AgentPrivateInfo(
             effective_capacity=capacity,

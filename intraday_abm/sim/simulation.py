@@ -177,7 +177,11 @@ def run_demo(config: SimulationConfig | None = None):
                 cost = lambda_down * (-delta)
             else:
                 cost = 0.0
-            pi.imbalance_cost += cost
+
+            # *** WICHTIG: kein Akkumulieren mehr ***
+            # Früher:  pi.imbalance_cost += cost
+            # Jetzt:   „Kosten, wenn JETZT Settlement wäre“
+            pi.imbalance_cost = cost
 
         # 3) Agenten-States loggen (nach Imbalance-/Kosten-Update, vor Handel)
         for ag in agents:
@@ -272,4 +276,5 @@ def run_demo(config: SimulationConfig | None = None):
 
 
 if __name__ == "__main__":
-    run_demo()
+    # Wenn dieses Modul direkt ausgeführt wird, nutze DEFAULT_CONFIG
+    run_demo(DEFAULT_CONFIG)
