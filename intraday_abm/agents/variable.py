@@ -14,12 +14,21 @@ class VariableAgent(Agent):
     Shinde-inspirierter „variable agent“ (z.B. Wind/PV/variable Last).
 
     Vereinfachte Struktur:
+
     - besitzt ein Forecast-Profil (Erzeugung/Last) als Funktion f(t)
-      oder konstante Basisgröße (base_forecast)
-    - Imbalance = forecast(t) - market_position
-    - bei positiver Imbalance (Überproduktion): SELL
-    - bei negativer Imbalance (Defizit): BUY
-    - Preiswahl nahe am Midprice / DA-Preis (Naive-artig)
+      oder konstante Basisgröße (base_forecast).
+    - Imbalance wird definiert als
+          δ_t = forecast(t) - market_position
+      d.h.:
+        * δ_t > 0 → erwartete Einspeisung > bisher gehandelte Position
+                    → Überproduktion → SELL
+        * δ_t < 0 → erwartete Einspeisung < bisher gehandelte Position
+                    → Defizit → BUY
+    - Erst wenn |δ_t| über einer Toleranz (imbalance_tolerance) liegt, wird
+      im CID gehandelt.
+    - Volumen ist durch |δ_t|, base_volume und Kapazität begrenzt.
+    - Der Preis wird über compute_order_price bestimmt, so dass optional eine
+      PricingStrategy genutzt werden kann.
     """
 
     base_forecast: float = 20.0
@@ -28,92 +37,110 @@ class VariableAgent(Agent):
     imbalance_tolerance: float = 1.0  # bis zu dieser Imbalance passiert nichts
 
     def _forecast(self, t: int) -> float:
-        """Liefert den Forecast-Wert für Zeitpunkt t."""
+        """
+        Liefert den Forecast-Wert für Zeitpunkt t.
+
+        - Falls eine forecast_fn gesetzt ist, wird diese genutzt.
+        - Andernfalls wird eine konstante Basisgröße (base_forecast)
+          zurückgegeben.
+        """
         if self.forecast_fn is not None:
             return self.forecast_fn(t)
         return self.base_forecast
 
     def update_imbalance(self, t: int) -> None:
         """
-        Überschreibt die Standard-Imbalance:
+        Aktualisiert die Imbalance δ_t für VariableAgent.
 
-        δ_{i,t} = forecast_i(t) - market_position_i
+        δ_t = forecast(t) - market_position
+
+        Diese Definition ist konsistent mit der Idee:
+        - forecast(t) repräsentiert zu erwartende Erzeugung/Last,
+        - market_position repräsentiert die bisher über DA/CID verkaufte/gekaufte
+          Energiemenge (Netto).
         """
         forecast = self._forecast(t)
-        mar_pos = self.private_info.market_position
-        self.private_info.imbalance = forecast - mar_pos
+        pi = self.private_info
+        pi.imbalance = forecast - pi.market_position
 
-    def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order]:
+    def decide_order(
+        self,
+        t: int,
+        public_info: PublicInfo,
+    ) -> Optional[Order]:
         """
-        Entscheidet anhand der Imbalance über BUY/SELL.
+        Bestimme eine Order für den VariableAgent:
 
-        - δ = forecast(t) - market_position
-        - δ >> 0  -> SELL (Überproduktion)
-        - δ << 0  -> BUY  (Defizit)
-        - Volumen ∝ |δ|, begrenzt durch Kapazität
+        1. Forecast(t) und δ_t = forecast - market_position bestimmen.
+        2. Wenn |δ_t| <= imbalance_tolerance → keine Order.
+        3. Kapazität & aktuelle Marktposition begrenzen das Ordervolumen.
+        4. Side:
+           - δ_t > 0  → SELL (Überproduktion)
+           - δ_t < 0  → BUY  (Defizit)
+        5. Preis über compute_order_price bestimmen.
         """
 
-        bb = public_info.tob.best_bid_price
-        ba = public_info.tob.best_ask_price
-
-        if bb is None and ba is None:
-            return None
-
-        if bb is not None and ba is not None:
-            mid = 0.5 * (bb + ba)
-        else:
-            mid = bb if bb is not None else ba
-        if mid is None:
-            mid = public_info.da_price
-
-        # Forecast und Imbalance aktualisieren
+        # --- 1) Forecast & Imbalance ----------------------------------------
         self.update_imbalance(t)
-        imbalance = self.private_info.imbalance
+        pi = self.private_info
+        delta = pi.imbalance
 
-        if abs(imbalance) <= self.imbalance_tolerance:
+        # Kleine Imbalance ignorieren (Totzone)
+        if abs(delta) <= self.imbalance_tolerance:
             return None
 
-        # Kapazitätsgrenzen
-        cap = self.private_info.effective_capacity
-        mar_pos = self.private_info.market_position
+        # --- 2) Kapazitätsgrenzen -------------------------------------------
+        cap = pi.effective_capacity
+        mar_pos = pi.market_position
+
+        if cap <= 0.0:
+            return None
+
+        # Symmetrische Kapazität um 0: je weiter wir schon „ausgelenkt“ sind,
+        # desto weniger ist noch verfügbar.
         available_capacity = max(0.0, cap - abs(mar_pos))
         if available_capacity <= 0.0:
             return None
 
-        desired_volume = min(abs(imbalance), self.base_volume, available_capacity)
-        if desired_volume <= 0.0:
+        # --- 3) Volumen aus Imbalance ableiten ------------------------------
+        volume = min(abs(delta), self.base_volume, available_capacity)
+        if volume <= 0.0:
             return None
 
-        # Richtung
-        if imbalance > 0:
-            side = Side.SELL
-        else:
-            side = Side.BUY
+        # --- 4) Side bestimmen ----------------------------------------------
+        # δ_t > 0: forecast > market_position → wir haben zu viel „physisch“
+        #          → SELL, um Imbalance abzubauen.
+        # δ_t < 0: forecast < market_position → Defizit → BUY.
+        side = Side.SELL if delta > 0.0 else Side.BUY
 
-        # Preiswahl Naive-artig um den Midprice herum
-        price_spread = 2.0  # kleine Spanne um mid
-        if side == Side.SELL:
-            price = mid + self.rng.uniform(0.0, price_spread)
-        else:
-            price = mid - self.rng.uniform(0.0, price_spread)
+        # --- 5) Preis bestimmen ---------------------------------------------
+        price = self.compute_order_price(
+            public_info=public_info,
+            side=side,
+            volume=volume,
+        )
 
+        # --- 6) Order erzeugen ----------------------------------------------
         return Order(
             id=-1,
             agent_id=self.id,
             side=side,
             price=price,
-            volume=desired_volume,
+            volume=volume,
             product_id=0,
+            time_in_force=None,
+            timestamp=t,
         )
 
     @classmethod
     def create(
         cls,
+        *,
         id: int,
         rng,
         capacity: float,
-        base_forecast: float = 20.0,
-        base_volume: float = 5.0,
+        base_forecast: float,
+        base_volume: float,
         imbalance_tolerance: float = 1.0,
         forecast_fn: Optional[Callable[[int], float]] = None,
     ) -> "VariableAgent":

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from random import Random
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, List, Tuple
 
 from intraday_abm.core.types import Side, PublicInfo
 
@@ -13,87 +13,201 @@ if TYPE_CHECKING:
 class PricingStrategy(ABC):
     """
     Abstrakte Basisklasse für Preisstrategien.
+
+    Wichtig:
+    - RandomLiquidityAgent nutzt build_price_volume_curve(...)
+    - DispatchableAgent / VariableAgent nutzen compute_price(...)
+      (über Agent.compute_order_price).
     """
 
-    def __init__(self, rng: Optional[Random] = None) -> None:
-        self.rng: Random = rng or Random()
+    def __init__(self, rng: Random):
+        self.rng = rng
 
     @abstractmethod
     def build_price_volume_curve(
         self,
         *,
-        agent: Agent,
+        agent: "Agent",
         public_info: PublicInfo,
         side: Side,
         total_volume: float,
-    ) -> list[tuple[float, float]]:
+    ) -> List[Tuple[float, float]]:
         """
-        Gibt eine Liste von Preis-Volumen-Paaren für Orders zurück.
+        Erzeugt eine diskrete Price-Volume-Kurve:
+        Rückgabe: Liste von (price, volume)-Tupeln.
         """
-        raise NotImplementedError
+        ...
+
+    # NICHT abstract: Default-Implementation, kann von Subklassen
+    # überschrieben werden
+    def compute_price(
+        self,
+        *,
+        agent: Optional["Agent"] = None,
+        public_info: PublicInfo,
+        side: Side,
+        volume: float,
+        **kwargs,
+    ) -> float:
+        """
+        Default-Fallback: nutzt die Marktinformation (TOB/DA-Preis),
+        um einen einfachen Preis zu bestimmen.
+
+        DispatchableAgent / VariableAgent rufen diese Methode über
+        Agent.compute_order_price(...) auf.
+        """
+        tob = public_info.tob
+        bb = tob.best_bid_price
+        ba = tob.best_ask_price
+
+        if bb is not None and ba is not None:
+            return 0.5 * (bb + ba)
+        elif bb is not None:
+            return bb
+        elif ba is not None:
+            return ba
+        else:
+            return public_info.da_price
 
 
 class NaivePricingStrategy(PricingStrategy):
     """
-    Shinde-nahe naive Preisstrategie:
+    Shinde-nahe naive Preisstrategie.
 
-    - Symmetrisches Preisband um Midprice oder DA-Preis
-    - Diskret segmentiert (z.B. in 20 Preisstufen)
-    - Liefert n zufällig ausgewählte Preisstufen für Orders
+    Idee:
+    - Bestimme einen Referenzpreis p* (Midprice, falls verfügbar,
+      sonst best_bid/best_ask oder DA-Preis).
+    - Erzeuge ein Preisintervall um p* mit Breite pi_range.
+    - Für RandomLiquidityAgent:
+      * baue eine diskrete Price-Volume-Kurve über dieses Intervall.
+    - Für Dispatchable/VariableAgent:
+      * compute_price(...) zieht einen einzelnen Preis aus dem
+        betreffenden Intervall [p* - pi_range, p* + pi_range],
+        ggf. leicht asymmetrisch nach BUY/SELL.
     """
 
     def __init__(
         self,
-        rng: Optional[Random] = None,
-        pi_range: float = 10.0,         # Breite des Preisbands (±)
-        n_segments: int = 20,           # Anzahl diskreter Preisstufen im Band
-        n_orders: int = 5,              # Anzahl Orders, die pro Tick erzeugt werden
-        min_price: float = 0.0,
-        max_price: float = 1000.0,
-    ) -> None:
-        super().__init__(rng=rng)
+        rng: Random,
+        pi_range: float,
+        n_segments: int,
+        n_orders: int,
+        min_price: float,
+        max_price: float,
+    ):
+        super().__init__(rng)
         self.pi_range = pi_range
-        self.n_segments = n_segments
-        self.n_orders = n_orders
+        self.n_segments = max(1, n_segments)
+        self.n_orders = max(1, n_orders)
         self.min_price = min_price
         self.max_price = max_price
 
-    def _reference_price(self, public_info: PublicInfo, side: Side) -> float:
+    # -------------------------------------------------------------
+    # Hilfsfunktionen
+    # -------------------------------------------------------------
+    def _reference_price(self, public_info: PublicInfo) -> float:
         tob = public_info.tob
-        bid = tob.best_bid_price
-        ask = tob.best_ask_price
+        bb = tob.best_bid_price
+        ba = tob.best_ask_price
 
-        if bid is not None and ask is not None:
-            return 0.5 * (bid + ask)
-        if side is Side.BUY and ask is not None:
-            return ask
-        if side is Side.SELL and bid is not None:
-            return bid
-        return public_info.da_price
+        if bb is not None and ba is not None:
+            return 0.5 * (bb + ba)
+        elif bb is not None:
+            return bb
+        elif ba is not None:
+            return ba
+        else:
+            return public_info.da_price
 
+    def _clip_price(self, p: float) -> float:
+        return max(self.min_price, min(self.max_price, p))
+
+    # -------------------------------------------------------------
+    # Für RandomLiquidityAgent (Price-Volume-Kurve)
+    # -------------------------------------------------------------
     def build_price_volume_curve(
         self,
         *,
-        agent: Agent,
+        agent: "Agent",
         public_info: PublicInfo,
         side: Side,
         total_volume: float,
-    ) -> list[tuple[float, float]]:
+    ) -> List[Tuple[float, float]]:
         """
-        Gibt n Preis-Volumen-Paare zurück, gleichmäßig verteilt im Preisband.
+        Erzeugt eine einfache diskrete Price-Volume-Kurve über ein
+        Intervall um den Referenzpreis.
+
+        - total_volume wird gleichmäßig auf n_segments verteilt
+        - Preise werden linear im Intervall verteilt + leichtes Jitter
         """
 
-        ref_price = self._reference_price(public_info, side)
+        if total_volume <= 0.0:
+            return []
 
-        delta = self.pi_range / self.n_segments
-        lower = max(self.min_price, ref_price - 0.5 * self.pi_range)
-        upper = min(self.max_price, ref_price + 0.5 * self.pi_range)
+        ref = self._reference_price(public_info)
 
-        grid = [lower + i * delta for i in range(self.n_segments + 1)]
-        prices = self.rng.sample(grid, k=min(self.n_orders, len(grid)))
+        # Intervall um den Referenzpreis
+        half_range = 0.5 * self.pi_range
+        p_min = self._clip_price(ref - half_range)
+        p_max = self._clip_price(ref + half_range)
 
-        volume = total_volume / len(prices)
-        return [(p, volume) for p in prices]
+        if p_max <= p_min:
+            # degeneriertes Intervall → alles auf einen Preis
+            return [(p_min, total_volume)]
+
+        vol_per_segment = total_volume / float(self.n_segments)
+        curve: List[Tuple[float, float]] = []
+
+        for i in range(self.n_segments):
+            # lineare Position im Intervall
+            frac = (i + 0.5) / self.n_segments
+            base_price = p_min + frac * (p_max - p_min)
+
+            # kleiner Zufalls-Jitter, um die Preise zu streuen
+            jitter = self.rng.uniform(-0.2, 0.2)
+            price = self._clip_price(base_price + jitter)
+
+            curve.append((price, vol_per_segment))
+
+        return curve
+
+    # -------------------------------------------------------------
+    # Für DispatchableAgent / VariableAgent (einzelner Preis)
+    # -------------------------------------------------------------
+    def compute_price(
+        self,
+        *,
+        agent: Optional["Agent"] = None,
+        public_info: PublicInfo,
+        side: Side,
+        volume: float,
+        **kwargs,
+    ) -> float:
+        """
+        Einzelpreis für eine Order.
+
+        - Referenzpreis p* wie oben
+        - BUY:  Preis aus [p* - pi_range, p*]
+        - SELL: Preis aus [p*, p* + pi_range]
+        - alles geclippt auf [min_price, max_price]
+        """
+        ref = self._reference_price(public_info)
+        half_range = self.pi_range
+
+        if side == Side.BUY:
+            low = self._clip_price(ref - half_range)
+            high = self._clip_price(ref)
+        else:  # SELL
+            low = self._clip_price(ref)
+            high = self._clip_price(ref + half_range)
+
+        if high < low:
+            low, high = high, low
+
+        if high == low:
+            return low
+
+        return self.rng.uniform(low, high)
 
 
 class MTAAPricingStrategy(PricingStrategy):
@@ -105,9 +219,13 @@ class MTAAPricingStrategy(PricingStrategy):
     def build_price_volume_curve(
         self,
         *,
-        agent: Agent,
+        agent: "Agent",
         public_info: PublicInfo,
         side: Side,
         total_volume: float,
-    ) -> list[tuple[float, float]]:
+    ) -> List[Tuple[float, float]]:
+        """
+        Hier könnten die Formeln für MTAA (Shinde) implementiert werden.
+        Aktuell nicht implementiert.
+        """
         raise NotImplementedError("MTAA-Strategie ist noch nicht implementiert.")

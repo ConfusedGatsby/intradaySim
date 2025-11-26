@@ -103,6 +103,9 @@ def run_demo(config: SimulationConfig | None = None):
             base_volume=config.dispatchable_base_volume,
             epsilon_price=config.dispatchable_epsilon_price,
         )
+        # zentrale Preisstrategie zuweisen (falls genutzt)
+        d_ag.pricing_strategy = pricing_strategy
+
         agents.append(d_ag)
         next_id += 1
 
@@ -116,6 +119,9 @@ def run_demo(config: SimulationConfig | None = None):
             base_volume=config.variable_base_volume,
             imbalance_tolerance=config.variable_imbalance_tolerance,
         )
+        # zentrale Preisstrategie zuweisen (falls genutzt)
+        v_ag.pricing_strategy = pricing_strategy
+
         agents.append(v_ag)
         next_id += 1
 
@@ -127,6 +133,9 @@ def run_demo(config: SimulationConfig | None = None):
             capacity=100.0,
             base_volume=5.0,
         )
+        # zentrale Preisstrategie zuweisen (falls genutzt)
+        t_ag.pricing_strategy = pricing_strategy
+
         agents.append(t_ag)
         next_id += 1
 

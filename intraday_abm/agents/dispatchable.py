@@ -14,60 +14,84 @@ class DispatchableAgent(Agent):
     Shinde-inspirierter „dispatchable agent“ (z.B. thermisches Kraftwerk).
 
     Vereinfachte, aber Shinde-nahe Idee:
-    - hat eine Grenzkosten-Schätzung (marginal_cost)
-    - hat eine Day-Ahead-Position (private_info.da_position)
-    - besitzt eine effektive Kapazität (private_info.effective_capacity)
-    - beobachtet Day-Ahead-Preis und aktuelles Top-of-Book (PublicInfo)
 
-    Entscheidungslogik (Heuristik):
-    - Wenn Marktpreis deutlich über Grenzkosten liegt und noch Volumen
-      zu verkaufen ist (DA-Position noch nicht erreicht), dann SELL.
-    - Wenn Marktpreis deutlich unter Grenzkosten liegt und die aktuelle
-      Marktposition zu hoch ist (Überverkauf), dann BUY.
-    - Volumen wird durch Kapazität und Abweichung von der DA-Position begrenzt.
+    - Der Agent hat eine Day-Ahead-Position (private_info.da_position)
+      und eine effektive Kapazität (private_info.effective_capacity).
+    - Er kennt seine Grenzkosten (marginal_cost).
+    - Er hat ein typisches Ordervolumen pro Tick (base_volume).
+    - Er betrachtet, ob der aktuelle Marktpreis (Midprice, TOB) deutlich
+      über/unter den Grenzkosten liegt (epsilon_price als Mindestmarge).
+    - Die Imbalance wird als
+          δ_t = da_position - market_position
+      definiert. Sie gibt an, wie weit die aktuelle Marktposition von der
+      DA-Position entfernt ist.
 
-    Imbalance-Definition:
-    - δ_t = da_position - market_position
-      > 0  => Unterlieferung (wir „hängen hinterher“ → eher SELL)
-      < 0  => Überlieferung (zu viel verkauft)       → eher BUY
+    Entscheidungslogik (heuristisch, Shinde-nah):
 
-    Imbalance-Kosten:
-    - Die eigentliche finanzielle Abrechnung erfolgt zentral in der
-      Simulation (z.B. einmalig am Ende des Zeithorizonts).
-    - Diese Klasse setzt nur pi.imbalance als physisches Steuersignal.
-    - Das Feld imbalance_penalty ist aktuell nur als Konfig-Parameter
-      vorgesehen (für spätere lokale Heuristiken), wird aber NICHT
-      mehr benutzt, um Kosten aufzuräumen.
+    1. δ_t bestimmen (DA-Lücke):
+       - δ_t > 0  → unterverkauft relativ zur DA-Position
+       - δ_t < 0  → überverkauft relativ zur DA-Position
+
+    2. Kapazität prüfen:
+       - effektive Kapazität C und aktuelle Marktposition p_mar begrenzen
+         das noch handelbare Volumen.
+
+    3. Zielvolumen:
+       - Volumen proportional zur Größe der DA-Lücke,
+         begrenzt durch base_volume und verfügbare Kapazität.
+
+    4. Profitchance:
+       - SELL ist attraktiv, wenn Midprice deutlich über marginal_cost liegt.
+       - BUY ist attraktiv, wenn Midprice deutlich unter marginal_cost liegt.
+       - Die Marge wird über epsilon_price gesteuert.
+
+    5. Side-Wahl:
+       - Primär: in Richtung DA-Position gehen, sofern profitabel.
+       - Fallback: wenn nur eine Richtung profitabel ist, folge dieser.
+       - Sonst: keine Order.
+
+    6. Preis:
+       - Nutzung von Agent.compute_order_price(), d.h.:
+         * falls eine PricingStrategy gesetzt ist → Strategy entscheidet,
+         * sonst Fallback: Day-Ahead-Preis.
+       - Damit sind wir kompatibel mit einer späteren MTAA-/Naive-Strategie.
     """
 
-    marginal_cost: float          # Grenzkosten [€/MWh]
-    base_volume: float = 5.0      # typisches Ordervolumen
-    epsilon_price: float = 1.0    # Mindest-Marge in €/MWh
-    imbalance_penalty: float = 0.0  # aktuell nur „Deko“, zentrale Kosten in simulation.py
+    # Modellparameter
+    marginal_cost: float            # Grenzkosten [€/MWh]
+    base_volume: float = 5.0        # typisches Ordervolumen pro Tick
+    epsilon_price: float = 1.0      # Mindest-Marge in €/MWh
+    imbalance_penalty: float = 0.0  # (aktuell nur Dokumentation, Kosten in simulation.py)
 
-    def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order]:
+    def decide_order(
+        self,
+        t: int,
+        public_info: PublicInfo,
+    ) -> Optional[Order]:
         """
-        Trifft eine Shinde-inspirierte Handelsentscheidung.
+        Bestimme eine (ggf. leere) Order basierend auf:
 
-        - Nutzt DA-Position und aktuelle Marktposition
-        - vergleicht Midprice / TOB-Preise mit Grenzkosten
-        - wählt SELL/BUY und Limitpreis innerhalb eines sinnvollen Intervalls
+        - aktueller Imbalance δ_t = da_position - market_position,
+        - Kapazitätsrestriktionen,
+        - Midprice vs. Grenzkosten,
+        - Mindestmarge epsilon_price.
+
+        Die konkrete Preisfindung wird an compute_order_price delegiert,
+        wodurch eine zentrale PricingStrategy genutzt werden kann.
         """
 
-        # --- 1) Preis-Signale rekonstruieren --------------------------------
-        bb = public_info.tob.best_bid_price
-        ba = public_info.tob.best_ask_price
+        tob = public_info.tob
+        bb = tob.best_bid_price
+        ba = tob.best_ask_price
 
-        if bb is None and ba is None:
-            # kein Marktpreis beobachtbar
-            return None
-
+        # Wenn überhaupt kein Marktpreis vorliegt, nutzen wir DA-Preis.
         if bb is not None and ba is not None:
             mid = 0.5 * (bb + ba)
+        elif bb is not None:
+            mid = bb
+        elif ba is not None:
+            mid = ba
         else:
-            # fallback: nutze existierenden TOB-Preis oder DA-Preis
-            mid = bb if bb is not None else ba
-        if mid is None:
             mid = public_info.da_price
 
         # --- 2) Kapazität, Position & Imbalance -----------------------------
@@ -78,105 +102,91 @@ class DispatchableAgent(Agent):
 
         # Imbalance nach Shinde-Logik:
         # δ_t = da_position - market_position
-        imbalance = da_pos - mar_pos
-        pi.imbalance = imbalance
+        # δ_t > 0: unterverkauft relativ zur DA-Position
+        # δ_t < 0: überverkauft relativ zur DA-Position
+        delta = da_pos - mar_pos
+        pi.imbalance = delta
 
-        # >>> WICHTIG: keine lokale Akkumulation von Imbalance-Kosten mehr <<<
-        # Die eigentliche Abrechnung erfolgt zentral in der Simulation.
+        # Wenn praktisch keine DA-Lücke besteht oder keine Kapazität vorhanden
+        if abs(delta) <= 1e-6 or cap <= 0.0:
+            return None
 
-        # Wie weit sind wir von der DA-Position entfernt?
-        # positive Lücke: wir können noch verkaufen,
-        # negative Lücke: wir sind über die DA-Position hinaus verkauft.
-        pos_gap = imbalance  # = da_pos - mar_pos
-
-        # frei verfügbare zusätzliche Nutzung (Symmetrie um 0 herum)
+        # Frei verfügbare „Restkapazität“ um die aktuelle Marktposition herum
         available_capacity = max(0.0, cap - abs(mar_pos))
         if available_capacity <= 0.0:
             return None
 
-        # Volumen an Lücke und Kapazität koppeln
-        # (verhindert unrealistisch große Orders)
-        raw_volume = min(abs(pos_gap), self.base_volume)
-        volume = min(raw_volume, available_capacity)
+        # Volumen an Lücke und Kapazität koppeln (verhindert große Sprünge)
+        volume = min(abs(delta), self.base_volume, available_capacity)
         if volume <= 0.0:
             return None
 
         # --- 3) Profitchancen relativ zu Grenzkosten prüfen -----------------
         spread_to_cost = mid - self.marginal_cost
-
-        # SELL profitabel: Marktpreis deutlich über Grenzkosten
         sell_profitable = spread_to_cost >= self.epsilon_price
-        # BUY profitabel: Marktpreis deutlich unter Grenzkosten
         buy_profitable = spread_to_cost <= -self.epsilon_price
 
-        # Wenn weder Kauf noch Verkauf eine klare Marge bietet -> abwarten
-        if not sell_profitable and not buy_profitable:
-            return None
-
         # --- 4) Handelsrichtung bestimmen -----------------------------------
-        # Priorität: DA-Lücke schließen
-        if sell_profitable and pos_gap > 0:
-            side = Side.SELL
-        elif buy_profitable and pos_gap < 0:
-            side = Side.BUY
-        else:
-            # Wenn Richtungen „konflikten“, wähle stärkere Marge
+        side: Optional[Side] = None
+
+        # Primär: Richtung, die die DA-Lücke schließt, falls profitabel
+        if delta > 0.0:
+            # Unterverkauft: wir müssen Marktposition erhöhen → SELL
+            if sell_profitable:
+                side = Side.SELL
+        elif delta < 0.0:
+            # Überverkauft: wir müssen Marktposition verringern → BUY
+            if buy_profitable:
+                side = Side.BUY
+
+        # Fallback: wenn nur eine Richtung profitabel ist, nimm diese
+        if side is None:
             if sell_profitable and not buy_profitable:
                 side = Side.SELL
             elif buy_profitable and not sell_profitable:
                 side = Side.BUY
             else:
-                # beide profitabel: wähle stärkere Abweichung von den Kosten
-                if abs(spread_to_cost) == 0:
-                    return None
-                if spread_to_cost > 0:
-                    side = Side.SELL
-                else:
-                    side = Side.BUY
+                # Weder klare Marge noch sinnvolle DA-Korrektur → keine Order
+                return None
 
-        # --- 5) Limitpreis Naive-artig um Mid herum -------------------------
-        price_spread = 2.0  # kleine Hilfsspanne, könnte später parametrisierbar werden
+        # --- 5) Limitpreis über PricingStrategy / Fallback bestimmen --------
+        price = self.compute_order_price(
+            public_info=public_info,
+            side=side,
+            volume=volume,
+        )
 
-        if side == Side.SELL:
-            # verkaufen etwas über Mid, aber nicht unter Grenzkosten
-            low = max(self.marginal_cost, mid)
-            high = max(low, mid + price_spread)
-            price = self.rng.uniform(low, high)
-        else:  # BUY
-            # kaufen etwas unter Mid, aber nicht über Grenzkosten
-            high = min(self.marginal_cost, mid)
-            low = min(high, mid - price_spread)
-            price = self.rng.uniform(low, high)
-
+        # --- 6) Order erzeugen ----------------------------------------------
         return Order(
-            id=-1,  # MarketOperator vergibt finale Order-ID
+            id=-1,  # wird vom MarketOperator gesetzt
             agent_id=self.id,
             side=side,
             price=price,
             volume=volume,
             product_id=0,
+            time_in_force=None,
+            timestamp=t,
         )
 
     @classmethod
     def create(
         cls,
+        *,
         id: int,
         rng,
         capacity: float,
         da_position: float,
         marginal_cost: float,
-        base_volume: float = 5.0,
-        epsilon_price: float = 1.0,
-        imbalance_penalty: float = 0.0,
+        base_volume: float,
+        epsilon_price: float,
     ) -> "DispatchableAgent":
         """
-        Convenience-Factory:
-        erzeugt einen DispatchableAgent mit AgentPrivateInfo.
+        Convenience-Factory, um einen DispatchableAgent mit AgentPrivateInfo
+        zu erzeugen.
 
-        - capacity: effektive Kapazität C_max
-        - da_position: Day-Ahead-Position p_i^{DA}
-        - imbalance_penalty: (derzeit ungenutzt in der Agentenlogik,
-          Abrechnung der Imbalance-Kosten erfolgt zentral in simulation.py)
+        Hinweis: imbalance_penalty wird aktuell nicht direkt im Agenten
+        genutzt, sondern die Imbalance-Kosten werden in simulation.py
+        auf Basis der System-λ_up/λ_down berechnet.
         """
         priv = AgentPrivateInfo(
             effective_capacity=capacity,
@@ -189,5 +199,5 @@ class DispatchableAgent(Agent):
             marginal_cost=marginal_cost,
             base_volume=base_volume,
             epsilon_price=epsilon_price,
-            imbalance_penalty=imbalance_penalty,
+            imbalance_penalty=0.0,
         )
