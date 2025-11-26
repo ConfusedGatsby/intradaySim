@@ -54,7 +54,8 @@ class AgentPrivateInfo:
     - da_position:      p_i^{DA}, Day-Ahead-Position
     - market_position:  p^{mar}_{i,t}, laufende Intraday-Marktposition
     - revenue:          r_{i,t}, kumulierte Erlöse aus Intraday-Trades
-    - imbalance:        δ_{i,t}, Imbalance (z.B. Forecast - Position)
+    - imbalance:        δ_{i,t}, Imbalance (z.B. Ziel - Position)
+    - imbalance_cost:   kumulierte Imbalance-Kosten
     - est_imb_price_up / est_imb_price_down: Schätzungen von Imbalance-Preisen
 
     Für einfache Agents (Random/Trend) werden nur Teile davon benutzt, der Rest
@@ -65,5 +66,6 @@ class AgentPrivateInfo:
     market_position: float = 0.0
     revenue: float = 0.0
     imbalance: float = 0.0
+    imbalance_cost: float = 0.0
     est_imb_price_up: float = 0.0
     est_imb_price_down: float = 0.0

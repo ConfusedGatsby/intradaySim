@@ -36,6 +36,7 @@ class SimulationConfig:
     dispatchable_marginal_cost: float = 45.0
     dispatchable_base_volume: float = 5.0
     dispatchable_epsilon_price: float = 1.0
+    dispatchable_imbalance_penalty: float = 0.0  # €/MWh Abweichung
 
     # Variable Agents (z.B. Wind/PV)
     n_variable_agents: int = 1
@@ -43,6 +44,7 @@ class SimulationConfig:
     variable_base_forecast: float = 20.0
     variable_base_volume: float = 5.0
     variable_imbalance_tolerance: float = 1.0
+    variable_imbalance_penalty: float = 0.0      # €/MWh Abweichung
 
     # Logging / Export
     results_dir: str = "results"

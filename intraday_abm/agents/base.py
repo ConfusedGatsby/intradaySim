@@ -27,7 +27,7 @@ class Agent(ABC):
 
     # WICHTIG:
     # - init=False → dieses Feld taucht NICHT als Parameter im __init__ auf.
-    #   Damit kollidiert es NICHT mit den Feldern der Kindklassen (DispatchableAgent etc.).
+    #   Damit kollidiert es NICHT mit den Feldern der Kindklassen.
     # - Default = None → wir können später optional eine Strategy zuweisen.
     pricing_strategy: Optional[PricingStrategy] = field(
         default=None,
@@ -42,6 +42,19 @@ class Agent(ABC):
         Gibt eine Order zurück oder None (keine Aktivität in diesem Schritt).
         """
         ...
+
+    def update_imbalance(self, t: int) -> None:
+        """
+        Standard-Imbalance-Definition (für nicht-physische Agents):
+
+        δ_{i,t} = da_position_i - market_position_i
+
+        Für Random/Trend/Dispatchable ist das „physische Ziel“ die
+        Day-Ahead-Position (Default 0). VariableAgent überschreibt
+        diese Methode und nutzt Forecast(t).
+        """
+        pi = self.private_info
+        pi.imbalance = pi.da_position - pi.market_position
 
     def compute_order_price(
         self,
@@ -75,7 +88,7 @@ class Agent(ABC):
 
         Orientierung an Shinde:
         - market_position p_mar erhöht sich bei Verkäufen, verringert sich bei Käufen
-        - revenue r_i,t steigt bei Verkäufen und fällt bei Käufen
+        - revenue r_{i,t} steigt bei Verkäufen und fällt bei Käufen
         """
         if side == Side.SELL:
             # Verkauft: Position steigt, Erlöse steigen

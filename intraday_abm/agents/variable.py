@@ -33,6 +33,16 @@ class VariableAgent(Agent):
             return self.forecast_fn(t)
         return self.base_forecast
 
+    def update_imbalance(self, t: int) -> None:
+        """
+        Überschreibt die Standard-Imbalance:
+
+        δ_{i,t} = forecast_i(t) - market_position_i
+        """
+        forecast = self._forecast(t)
+        mar_pos = self.private_info.market_position
+        self.private_info.imbalance = forecast - mar_pos
+
     def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order]:
         """
         Entscheidet anhand der Imbalance über BUY/SELL.
@@ -56,18 +66,16 @@ class VariableAgent(Agent):
         if mid is None:
             mid = public_info.da_price
 
-        # Forecast und Imbalance
-        forecast = self._forecast(t)
-        mar_pos = self.private_info.market_position
-
-        imbalance = forecast - mar_pos
-        self.private_info.imbalance = imbalance
+        # Forecast und Imbalance aktualisieren
+        self.update_imbalance(t)
+        imbalance = self.private_info.imbalance
 
         if abs(imbalance) <= self.imbalance_tolerance:
             return None
 
         # Kapazitätsgrenzen
         cap = self.private_info.effective_capacity
+        mar_pos = self.private_info.market_position
         available_capacity = max(0.0, cap - abs(mar_pos))
         if available_capacity <= 0.0:
             return None

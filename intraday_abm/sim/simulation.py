@@ -41,6 +41,23 @@ def create_pricing_strategy(config: SimulationConfig, rng) -> NaivePricingStrate
     )
 
 
+def get_imbalance_prices(t: int, config: SimulationConfig) -> tuple[float, float]:
+    """
+    Sehr einfache, exogene Imbalance-Preise (Up/Down) in €/MWh.
+
+    Für den Start:
+    - lambda_up:   da_price + 10
+    - lambda_down: max(0, da_price - 10)
+
+    Später kannst du das durch ein realistischeres Modell ersetzen
+    (z.B. abhängig von System-Imbalance, Zufallsprozessen, etc.).
+    """
+    base = config.da_price
+    lambda_up = base + 10.0
+    lambda_down = max(0.0, base - 10.0)
+    return lambda_up, lambda_down
+
+
 def run_demo(config: SimulationConfig | None = None):
     if config is None:
         config = DEFAULT_CONFIG
@@ -86,8 +103,6 @@ def run_demo(config: SimulationConfig | None = None):
             base_volume=config.dispatchable_base_volume,
             epsilon_price=config.dispatchable_epsilon_price,
         )
-        # Phase 2: DispatchableAgent behält vorerst seine interne Heuristik.
-        # In Phase 3 kann hier ebenfalls eine PricingStrategy zugewiesen werden.
         agents.append(d_ag)
         next_id += 1
 
@@ -101,8 +116,6 @@ def run_demo(config: SimulationConfig | None = None):
             base_volume=config.variable_base_volume,
             imbalance_tolerance=config.variable_imbalance_tolerance,
         )
-        # Phase 2: VariableAgent behält vorerst seine interne Heuristik.
-        # In Phase 3 kann hier ebenfalls eine PricingStrategy zugewiesen werden.
         agents.append(v_ag)
         next_id += 1
 
@@ -137,8 +150,11 @@ def run_demo(config: SimulationConfig | None = None):
             "position": [],
             "revenue": [],
             "imbalance": [],
+            "imbalance_cost": [],
             "da_position": [],
             "capacity": [],
+            "est_imb_price_up": [],
+            "est_imb_price_down": [],
         }
         for ag in agents
     }
@@ -146,15 +162,36 @@ def run_demo(config: SimulationConfig | None = None):
     for t in range(config.n_steps):
         trades_this_step = 0
 
-        # Agenten-States loggen (vor dem Handel)
+        # 1) Imbalance für alle Agenten aktualisieren
+        for ag in agents:
+            ag.update_imbalance(t)
+
+        # 2) Imbalance-Kosten anwenden (einfaches exogenes Schema)
+        lambda_up, lambda_down = get_imbalance_prices(t, config)
         for ag in agents:
             pi = ag.private_info
-            agent_logs[ag.id]["t"].append(t)
-            agent_logs[ag.id]["position"].append(pi.market_position)
-            agent_logs[ag.id]["revenue"].append(pi.revenue)
-            agent_logs[ag.id]["imbalance"].append(pi.imbalance)
-            agent_logs[ag.id]["da_position"].append(pi.da_position)
-            agent_logs[ag.id]["capacity"].append(pi.effective_capacity)
+            delta = pi.imbalance
+            if delta > 0.0:
+                cost = lambda_up * delta
+            elif delta < 0.0:
+                cost = lambda_down * (-delta)
+            else:
+                cost = 0.0
+            pi.imbalance_cost += cost
+
+        # 3) Agenten-States loggen (nach Imbalance-/Kosten-Update, vor Handel)
+        for ag in agents:
+            pi = ag.private_info
+            logs = agent_logs[ag.id]
+            logs["t"].append(t)
+            logs["position"].append(pi.market_position)
+            logs["revenue"].append(pi.revenue)
+            logs["imbalance"].append(pi.imbalance)
+            logs["imbalance_cost"].append(pi.imbalance_cost)
+            logs["da_position"].append(pi.da_position)
+            logs["capacity"].append(pi.effective_capacity)
+            logs["est_imb_price_up"].append(pi.est_imb_price_up)
+            logs["est_imb_price_down"].append(pi.est_imb_price_down)
 
         # Handelsrunde ------------------------------------------------------
         for agent in agents:
@@ -228,7 +265,7 @@ def run_demo(config: SimulationConfig | None = None):
         print(
             f"Agent {ag.id} ({ag.__class__.__name__}): "
             f"pos={pi.market_position:.2f}, rev={pi.revenue:.2f}, "
-            f"imbalance={pi.imbalance:.2f}"
+            f"imbalance={pi.imbalance:.2f}, imb_cost={pi.imbalance_cost:.2f}"
         )
 
     return log, agent_logs, mo

@@ -25,11 +25,21 @@ class DispatchableAgent(Agent):
     - Wenn Marktpreis deutlich unter Grenzkosten liegt und die aktuelle
       Marktposition zu hoch ist (Überverkauf), dann BUY.
     - Volumen wird durch Kapazität und Abweichung von der DA-Position begrenzt.
+
+    Imbalance-Definition:
+    - δ_t = da_position - market_position
+      > 0  => Unterlieferung (wir „hängen hinterher“ → eher SELL)
+      < 0  => Überlieferung (zu viel verkauft)       → eher BUY
+
+    Imbalance-Kosten:
+    - private_info.imbalance_cost akkumuliert
+      imbalance_penalty * |δ_t| pro Zeitschritt.
     """
 
     marginal_cost: float          # Grenzkosten [€/MWh]
     base_volume: float = 5.0      # typisches Ordervolumen
     epsilon_price: float = 1.0    # Mindest-Marge in €/MWh
+    imbalance_penalty: float = 0.0  # Strafkosten pro Einheit |δ_t|
 
     def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order]:
         """
@@ -56,19 +66,25 @@ class DispatchableAgent(Agent):
         if mid is None:
             mid = public_info.da_price
 
-        # --- 2) Kapazität und Position --------------------------------------
-        cap = self.private_info.effective_capacity
-        da_pos = self.private_info.da_position
-        mar_pos = self.private_info.market_position
+        # --- 2) Kapazität, Position & Imbalance -----------------------------
+        pi = self.private_info
+        cap = pi.effective_capacity
+        da_pos = pi.da_position
+        mar_pos = pi.market_position
 
-        # Position wird in A2 bei Trades aktualisiert:
-        # SELL -> market_position += volume
-        # BUY  -> market_position -= volume
+        # Imbalance nach Shinde-Logik:
+        # δ_t = da_position - market_position
+        imbalance = da_pos - mar_pos
+        pi.imbalance = imbalance
+
+        # Imbalance-Kosten dieses Zeitschritts (nur Buchhaltung)
+        if self.imbalance_penalty != 0.0:
+            pi.imbalance_cost += self.imbalance_penalty * abs(imbalance)
 
         # Wie weit sind wir von der DA-Position entfernt?
         # positive Lücke: wir können noch verkaufen,
         # negative Lücke: wir sind über die DA-Position hinaus verkauft.
-        pos_gap = da_pos - mar_pos
+        pos_gap = imbalance  # = da_pos - mar_pos
 
         # frei verfügbare zusätzliche Nutzung (Symmetrie um 0 herum)
         available_capacity = max(0.0, cap - abs(mar_pos))
@@ -115,24 +131,19 @@ class DispatchableAgent(Agent):
                 else:
                     side = Side.BUY
 
-        # --- 5) Limitpreis (Naive-Strategie-artig) ---------------------------
-        # Idee: Preis nicht völlig willkürlich, sondern zwischen Grenzkosten
-        #       und aktuellem TOB angesiedelt.
+        # --- 5) Limitpreis Naive-artig um Mid herum -------------------------
+        price_spread = 2.0  # kleine Hilfsspanne, könnte später parametrisierbar werden
 
         if side == Side.SELL:
-            ref = bb if bb is not None else mid
-            limit = max(self.marginal_cost, min(ref, mid))
-            # Wenn Referenz <= Grenzkosten -> lieber nichts tun
-            if ref <= self.marginal_cost:
-                return None
-            price = self.rng.uniform(self.marginal_cost, ref)
+            # verkaufen etwas über Mid, aber nicht unter Grenzkosten
+            low = max(self.marginal_cost, mid)
+            high = max(low, mid + price_spread)
+            price = self.rng.uniform(low, high)
         else:  # BUY
-            ref = ba if ba is not None else mid
-            limit = min(self.marginal_cost, max(ref, mid))
-            # Wenn Referenz >= Grenzkosten -> lieber nichts tun
-            if ref >= self.marginal_cost:
-                return None
-            price = self.rng.uniform(ref, self.marginal_cost)
+            # kaufen etwas unter Mid, aber nicht über Grenzkosten
+            high = min(self.marginal_cost, mid)
+            low = min(high, mid - price_spread)
+            price = self.rng.uniform(low, high)
 
         return Order(
             id=-1,  # MarketOperator vergibt finale Order-ID
@@ -153,6 +164,7 @@ class DispatchableAgent(Agent):
         marginal_cost: float,
         base_volume: float = 5.0,
         epsilon_price: float = 1.0,
+        imbalance_penalty: float = 0.0,
     ) -> "DispatchableAgent":
         """
         Convenience-Factory:
@@ -160,6 +172,7 @@ class DispatchableAgent(Agent):
 
         - capacity: effektive Kapazität C_max
         - da_position: Day-Ahead-Position p_i^{DA}
+        - imbalance_penalty: Strafkosten pro Einheit |δ_t|
         """
         priv = AgentPrivateInfo(
             effective_capacity=capacity,
@@ -172,4 +185,5 @@ class DispatchableAgent(Agent):
             marginal_cost=marginal_cost,
             base_volume=base_volume,
             epsilon_price=epsilon_price,
+            imbalance_penalty=imbalance_penalty,
         )
