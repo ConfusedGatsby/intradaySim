@@ -13,7 +13,6 @@ from intraday_abm.agents.dispatchable import DispatchableAgent
 from intraday_abm.agents.variable import VariableAgent
 from intraday_abm.config_params import SimulationConfig, DEFAULT_CONFIG
 
-
 def run_demo(config: SimulationConfig | None = None):
     if config is None:
         config = DEFAULT_CONFIG
@@ -88,6 +87,7 @@ def run_demo(config: SimulationConfig | None = None):
     agent_logs = {
         ag.id: {
             "t": [],
+            "agent_id": ag.id,
             "agent_type": ag.__class__.__name__,
             "position": [],
             "revenue": [],
