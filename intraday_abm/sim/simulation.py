@@ -213,9 +213,9 @@ def run_demo(config: SimulationConfig | None = None):
 
             tob_raw = mo.get_tob()
             tob = TopOfBook(
-                best_bid_price=tob_raw["best_bid_price"],
+                best_bid_price=tob_raw.get("best_bid_price"),
                 best_bid_volume=None,
-                best_ask_price=tob_raw["best_ask_price"],
+                best_ask_price=tob_raw.get("best_ask_price"),
                 best_ask_volume=None,
             )
 

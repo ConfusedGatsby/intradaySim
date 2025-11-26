@@ -33,7 +33,7 @@ class SimulationConfig:
     n_dispatchable_agents: int = 2
     dispatchable_capacity: float = 100.0
     dispatchable_da_position: float = 50.0
-    dispatchable_marginal_cost: float = 45.0
+    dispatchable_marginal_cost: float = 35.0
     dispatchable_base_volume: float = 5.0
     dispatchable_epsilon_price: float = 1.0
     dispatchable_imbalance_penalty: float = 0.0  # €/MWh Abweichung

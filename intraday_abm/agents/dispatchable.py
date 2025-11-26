@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from intraday_abm.agents.base import Agent
-from intraday_abm.core.types import PublicInfo, AgentPrivateInfo, Side
+from intraday_abm.core.types import PublicInfo, AgentPrivateInfo, Side, TimeInForce
 from intraday_abm.core.order import Order
 
 
@@ -164,7 +164,7 @@ class DispatchableAgent(Agent):
             price=price,
             volume=volume,
             product_id=0,
-            time_in_force=None,
+            time_in_force=TimeInForce.GTC,
             timestamp=t,
         )
 
