@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import random
+from typing import Union, List
 
 from intraday_abm.core.order_book import OrderBook
 from intraday_abm.core.market_operator import MarketOperator
 from intraday_abm.core.types import PublicInfo, TopOfBook, Side
+from intraday_abm.core.order import Order
 from intraday_abm.agents.random_liquidity import RandomLiquidityAgent
 from intraday_abm.agents.simple_trend import SimpleTrendAgent
 from intraday_abm.agents.dispatchable import DispatchableAgent
@@ -13,34 +15,16 @@ from intraday_abm.config_params import SimulationConfig, DEFAULT_CONFIG
 
 
 def run_demo(config: SimulationConfig | None = None):
-    """
-    Führt eine Intraday-Simulation mit gegebener Konfiguration aus.
-
-    Kernidee:
-    - MarketOperator + OrderBook
-    - mehrere Agententypen:
-      - RandomLiquidityAgent (synthetischer Orderflow)
-      - DispatchableAgent (Thermal, Shinde-inspiriert)
-      - VariableAgent (RES/variable Last, Shinde-inspiriert)
-      - optional SimpleTrendAgent
-    - Shinde-nah:
-      - Cancel-First pro Agent
-      - PublicInfo (TOB + DA-Preis)
-      - AgentPrivateInfo mit Position/Revenue-Updates
-    """
     if config is None:
         config = DEFAULT_CONFIG
 
     rng = random.Random(config.seed)
-
-    # Ein Orderbuch für ein Produkt (product_id = 0)
     order_book = OrderBook(product_id=0)
     mo = MarketOperator(order_book=order_book)
 
     agents = []
     next_id = 1
 
-    # Random-Liquidity-Agents
     for _ in range(config.n_random_agents):
         ag = RandomLiquidityAgent.create(
             id=next_id,
@@ -54,7 +38,6 @@ def run_demo(config: SimulationConfig | None = None):
         agents.append(ag)
         next_id += 1
 
-    # Dispatchable Agents
     for _ in range(config.n_dispatchable_agents):
         d_ag = DispatchableAgent.create(
             id=next_id,
@@ -68,7 +51,6 @@ def run_demo(config: SimulationConfig | None = None):
         agents.append(d_ag)
         next_id += 1
 
-    # Variable Agents
     for _ in range(config.n_variable_agents):
         v_ag = VariableAgent.create(
             id=next_id,
@@ -81,7 +63,6 @@ def run_demo(config: SimulationConfig | None = None):
         agents.append(v_ag)
         next_id += 1
 
-    # Optional: Trend-Agent
     if config.use_trend_agent:
         t_ag = SimpleTrendAgent.create(
             id=next_id,
@@ -92,10 +73,8 @@ def run_demo(config: SimulationConfig | None = None):
         agents.append(t_ag)
         next_id += 1
 
-    # Map von Agent-ID auf Agent-Objekt (für Trade-Callbacks)
     agent_by_id = {ag.id: ag for ag in agents}
 
-    # Markt-Log (Top-of-Book etc.)
     log = {
         "t": [],
         "best_bid": [],
@@ -106,7 +85,6 @@ def run_demo(config: SimulationConfig | None = None):
         "trades": [],
     }
 
-    # Agenten-Logs: ein Dict pro Agent
     agent_logs = {
         ag.id: {
             "t": [],
@@ -120,11 +98,9 @@ def run_demo(config: SimulationConfig | None = None):
         for ag in agents
     }
 
-    # Hauptloop
     for t in range(config.n_steps):
         trades_this_step = 0
 
-        # --- Agenten-Zustände vor Aktionen loggen ---
         for ag in agents:
             pi = ag.private_info
             agent_logs[ag.id]["t"].append(t)
@@ -134,12 +110,9 @@ def run_demo(config: SimulationConfig | None = None):
             agent_logs[ag.id]["da_position"].append(pi.da_position)
             agent_logs[ag.id]["capacity"].append(pi.effective_capacity)
 
-        # --- Agenten handeln lassen ---
         for agent in agents:
-            # Shinde-nah: zuerst eigene Orders canceln
             mo.cancel_agent_orders(agent.id)
 
-            # TOB holen
             tob_raw = mo.get_tob()
             tob = TopOfBook(
                 best_bid_price=tob_raw["best_bid_price"],
@@ -148,29 +121,32 @@ def run_demo(config: SimulationConfig | None = None):
                 best_ask_volume=None,
             )
 
-            # Public Info
             public_info = PublicInfo(
                 tob=tob,
                 da_price=config.da_price,
             )
 
-            # Order-Entscheidung
-            order = agent.decide_order(t, public_info)
+            decision: Union[None, Order, List[Order]] = agent.decide_order(t, public_info)
+            orders = []
+            if decision is None:
+                continue
+            elif isinstance(decision, Order):
+                orders = [decision]
+            elif isinstance(decision, list):
+                orders = decision
 
-            if order is not None:
+            for order in orders:
                 trades = mo.process_order(order, time=t)
                 trades_this_step += len(trades)
 
-                # Trades an beteiligte Agenten zurückmelden
                 for tr in trades:
                     buyer = agent_by_id.get(tr.buy_agent_id)
                     seller = agent_by_id.get(tr.sell_agent_id)
-                    if buyer is not None:
+                    if buyer:
                         buyer.on_trade(tr.volume, tr.price, side=Side.BUY)
-                    if seller is not None:
+                    if seller:
                         seller.on_trade(tr.volume, tr.price, side=Side.SELL)
 
-        # --- Markt-Logging ---
         tob_end = mo.get_tob()
         bb = tob_end["best_bid_price"]
         ba = tob_end["best_ask_price"]
@@ -196,7 +172,6 @@ def run_demo(config: SimulationConfig | None = None):
             f"book_size: {len(mo.order_book)} trades: {trades_this_step}"
         )
 
-    # Kurze Agenten-Zusammenfassung
     print("\n=== Agenten-Zusammenfassung ===")
     for ag in agents:
         pi = ag.private_info

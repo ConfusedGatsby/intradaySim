@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
 
 
@@ -18,6 +17,11 @@ class SimulationConfig:
     random_max_price: float = 90.0
     min_volume: float = 1.0
     max_volume: float = 10.0
+
+    # Zusatzparameter für naive Preisstrategie (Shinde-nahe)
+    naive_pi_range: float = 10.0       # Breite des Preisbands (z.B. ±10 €)
+    naive_n_segments: int = 20         # Diskretisierung des Preisbands
+    naive_n_orders: int = 5            # Anzahl Orders pro Schritt
 
     # Trend-Agent
     use_trend_agent: bool = True
