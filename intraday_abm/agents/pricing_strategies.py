@@ -110,14 +110,16 @@ class NaivePricingStrategy(PricingStrategy):
         bb = tob.best_bid_price
         ba = tob.best_ask_price
 
+        # Mid als Signal nur nutzen, solange beide Seiten existieren.
+        # Zusätzlich dämpfen wir mit dem DA-Preis, damit sich der Referenzpreis
+        # nicht selbst hochschaukelt, wenn das Buch auf einer Seite dünn ist.
+        da = public_info.da_price
+
         if bb is not None and ba is not None:
-            return 0.5 * (bb + ba)
-        elif bb is not None:
-            return bb
-        elif ba is not None:
-            return ba
-        else:
-            return public_info.da_price
+            mid = 0.5 * (bb + ba)
+            return 0.5 * mid + 0.5 * da  # Mittelwert aus Mid und DA
+        # Nur eine Seite vorhanden -> stabiler Anker am DA-Preis
+        return da
 
     def _clip_price(self, p: float) -> float:
         return max(self.min_price, min(self.max_price, p))

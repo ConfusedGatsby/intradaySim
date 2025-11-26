@@ -255,7 +255,9 @@ def run_demo(config: SimulationConfig | None = None):
             mid = 0.5 * (bb + ba)
             spread = ba - bb
         else:
-            mid = None
+            # Fallback: wenn nur eine Seite im Buch ist, am DA-Preis verankern,
+            # damit der Mid nicht auf ein einseitiges Extrem springt.
+            mid = config.da_price
             spread = None
 
         log["t"].append(t)
