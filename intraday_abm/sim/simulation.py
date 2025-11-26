@@ -11,7 +11,35 @@ from intraday_abm.agents.random_liquidity import RandomLiquidityAgent
 from intraday_abm.agents.simple_trend import SimpleTrendAgent
 from intraday_abm.agents.dispatchable import DispatchableAgent
 from intraday_abm.agents.variable import VariableAgent
+from intraday_abm.agents.pricing_strategies import NaivePricingStrategy
 from intraday_abm.config_params import SimulationConfig, DEFAULT_CONFIG
+
+
+def create_pricing_strategy(config: SimulationConfig, rng) -> NaivePricingStrategy:
+    """
+    Erzeugt die global konfigurierte Preisstrategie für die Simulation.
+
+    Phase 2:
+    - Aktuell wird nur die NaivePricingStrategy unterstützt.
+    - Die Parameter stammen zentral aus der SimulationConfig.
+    - Später kann hier leicht auf MTAA o.ä. erweitert werden.
+    """
+    strategy_name = getattr(config, "pricing_strategy", "naive").lower()
+
+    if strategy_name == "naive":
+        return NaivePricingStrategy(
+            rng=rng,
+            pi_range=config.naive_pi_range,
+            n_segments=config.naive_n_segments,
+            n_orders=config.naive_n_orders,
+            min_price=config.random_min_price,
+            max_price=config.random_max_price,
+        )
+
+    raise NotImplementedError(
+        f"Pricing-Strategie '{config.pricing_strategy}' ist noch nicht implementiert."
+    )
+
 
 def run_demo(config: SimulationConfig | None = None):
     if config is None:
@@ -21,9 +49,13 @@ def run_demo(config: SimulationConfig | None = None):
     order_book = OrderBook(product_id=0)
     mo = MarketOperator(order_book=order_book)
 
+    # Phase 2: zentrale Preisstrategie erzeugen (aktuell: naive)
+    pricing_strategy = create_pricing_strategy(config, rng)
+
     agents = []
     next_id = 1
 
+    # Random-Liquidity-Agents -----------------------------------------------
     for _ in range(config.n_random_agents):
         ag = RandomLiquidityAgent.create(
             id=next_id,
@@ -33,10 +65,17 @@ def run_demo(config: SimulationConfig | None = None):
             max_price=config.random_max_price,
             min_volume=config.min_volume,
             max_volume=config.max_volume,
+            price_band_pi=config.naive_pi_range,
+            n_segments=config.naive_n_segments,
+            n_orders=config.naive_n_orders,
         )
+        # Zuweisung der zentral konfigurierten Preisstrategie
+        ag.pricing_strategy = pricing_strategy
+
         agents.append(ag)
         next_id += 1
 
+    # Dispatchable Agents ---------------------------------------------------
     for _ in range(config.n_dispatchable_agents):
         d_ag = DispatchableAgent.create(
             id=next_id,
@@ -47,9 +86,12 @@ def run_demo(config: SimulationConfig | None = None):
             base_volume=config.dispatchable_base_volume,
             epsilon_price=config.dispatchable_epsilon_price,
         )
+        # Phase 2: DispatchableAgent behält vorerst seine interne Heuristik.
+        # In Phase 3 kann hier ebenfalls eine PricingStrategy zugewiesen werden.
         agents.append(d_ag)
         next_id += 1
 
+    # Variable Agents -------------------------------------------------------
     for _ in range(config.n_variable_agents):
         v_ag = VariableAgent.create(
             id=next_id,
@@ -59,9 +101,12 @@ def run_demo(config: SimulationConfig | None = None):
             base_volume=config.variable_base_volume,
             imbalance_tolerance=config.variable_imbalance_tolerance,
         )
+        # Phase 2: VariableAgent behält vorerst seine interne Heuristik.
+        # In Phase 3 kann hier ebenfalls eine PricingStrategy zugewiesen werden.
         agents.append(v_ag)
         next_id += 1
 
+    # Optionaler Trend-Agent ------------------------------------------------
     if config.use_trend_agent:
         t_ag = SimpleTrendAgent.create(
             id=next_id,
@@ -101,6 +146,7 @@ def run_demo(config: SimulationConfig | None = None):
     for t in range(config.n_steps):
         trades_this_step = 0
 
+        # Agenten-States loggen (vor dem Handel)
         for ag in agents:
             pi = ag.private_info
             agent_logs[ag.id]["t"].append(t)
@@ -110,7 +156,9 @@ def run_demo(config: SimulationConfig | None = None):
             agent_logs[ag.id]["da_position"].append(pi.da_position)
             agent_logs[ag.id]["capacity"].append(pi.effective_capacity)
 
+        # Handelsrunde ------------------------------------------------------
         for agent in agents:
+            # Cancel-first: alle offenen Orders des Agenten löschen
             mo.cancel_agent_orders(agent.id)
 
             tob_raw = mo.get_tob()
@@ -127,13 +175,15 @@ def run_demo(config: SimulationConfig | None = None):
             )
 
             decision: Union[None, Order, List[Order]] = agent.decide_order(t, public_info)
-            orders = []
             if decision is None:
                 continue
             elif isinstance(decision, Order):
                 orders = [decision]
             elif isinstance(decision, list):
                 orders = decision
+            else:
+                # Unerwarteter Rückgabetyp
+                continue
 
             for order in orders:
                 trades = mo.process_order(order, time=t)

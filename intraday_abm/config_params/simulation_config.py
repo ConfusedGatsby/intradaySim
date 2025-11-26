@@ -19,6 +19,9 @@ class SimulationConfig:
     max_volume: float = 10.0
 
     # Zusatzparameter für naive Preisstrategie (Shinde-nahe)
+    # Diese Parameter steuern zentral die NaivePricingStrategy für alle
+    # RandomLiquidityAgents (und können später auch für andere Agententypen
+    # wie Dispatchable/Variable genutzt werden).
     naive_pi_range: float = 10.0       # Breite des Preisbands (z.B. ±10 €)
     naive_n_segments: int = 20         # Diskretisierung des Preisbands
     naive_n_orders: int = 5            # Anzahl Orders pro Schritt
@@ -44,6 +47,10 @@ class SimulationConfig:
     # Logging / Export
     results_dir: str = "results"
     csv_filename: str = "sim_log_seed_42.csv"
+
+    # Globale Auswahl der Preisstrategie (Vorbereitung für MTAA etc.).
+    # Aktuell wird nur "naive" unterstützt und in der Simulation genutzt.
+    pricing_strategy: str = "naive"
 
 
 DEFAULT_CONFIG = SimulationConfig()

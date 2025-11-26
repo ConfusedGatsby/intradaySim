@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 from intraday_abm.agents.base import Agent
-from intraday_abm.agents.pricing_strategies import NaivePricingStrategy
 from intraday_abm.core.types import Side, PublicInfo, AgentPrivateInfo
 from intraday_abm.core.order import Order
 
@@ -14,16 +13,18 @@ class RandomLiquidityAgent(Agent):
     """
     Shinde-nahe naive Trader mit diskretem Preisband und mehreren Orders.
 
-    Ursprüngliche Implementierung:
-    - Preisband-Logik (±π um den DA-Preis) war direkt im Agenten codiert.
-    - In jedem Schritt wurden n_orders zufällig über das Band verteilte Orders
-      erzeugt (jeweils mit zufälliger Side und zufälligem Volumen).
+    Refaktorisierte Version (Phase 1 + 2):
 
-    Refaktorisierte Version:
-    - Die eigentliche Preisband-Logik ist in NaivePricingStrategy gekapselt.
-    - Der Agent bestimmt nur noch das Gesamtvolumen, das er in diesem Tick
-      bereitstellen möchte, und verteilt dieses über die von der Strategy
-      gelieferten Preis-Volumen-Paare.
+    - Die eigentliche Preisband- und Preisfindungslogik liegt in einer
+      externen PricingStrategy (z.B. NaivePricingStrategy).
+    - Der Agent selbst entscheidet nur noch:
+        * wie viele Orders er typischerweise platzieren möchte (n_orders)
+        * welches Gesamtvolumen er in einem Tick bereitstellen möchte
+        * die Orderrichtung (BUY/SELL) pro Order
+        * lokale Volumengrenzen pro Order
+
+    Die Strategy wird von außen (in der Simulation) zugewiesen:
+    agent.pricing_strategy = <PricingStrategy-Instanz>
     """
 
     min_price: float
@@ -32,6 +33,9 @@ class RandomLiquidityAgent(Agent):
     max_volume: float
 
     # Shinde-nahe Konfig:
+    # price_band_pi und n_segments werden von der Strategy genutzt und sind
+    # hier nur noch zur Dokumentation / Konsistenz abgelegt. n_orders wird
+    # lokal genutzt, um das Ziel-Gesamtvolumen pro Tick zu bestimmen.
     price_band_pi: float = 10.0
     n_segments: int = 20
     n_orders: int = 5
@@ -39,7 +43,7 @@ class RandomLiquidityAgent(Agent):
     def decide_order(self, t: int, public_info: PublicInfo) -> Optional[Order | List[Order]]:
         """
         Platziert mehrere Orders, deren Preise durch eine PricingStrategy
-        (NaivePricingStrategy) bestimmt werden.
+        (z.B. NaivePricingStrategy) bestimmt werden.
 
         Schritte:
         1. Gesamtvolumen abschätzen, das der Agent in diesem Tick bereitstellen
@@ -62,9 +66,9 @@ class RandomLiquidityAgent(Agent):
         if total_volume <= 0.0:
             return None
 
-        # NaivePricingStrategy erzeugt eine diskrete Price-Volume-Kurve
+        # Die Preisstrategie erzeugt eine diskrete Price-Volume-Kurve.
         # Hinweis: Für die Referenzpreis-Bestimmung ist bei vorhandenem Bid & Ask
-        # die Side irrelevant (midprice). Wir geben hier BUY mit.
+        # die Side hier irrelevant (Midprice). Wir geben BUY mit.
         curve = self.pricing_strategy.build_price_volume_curve(
             agent=self,
             public_info=public_info,
@@ -116,13 +120,16 @@ class RandomLiquidityAgent(Agent):
         n_orders: int = 5,
     ) -> "RandomLiquidityAgent":
         """
-        Factory-Methode zum Erzeugen eines RandomLiquidityAgent inklusive
-        seiner NaivePricingStrategy.
+        Factory-Methode zum Erzeugen eines RandomLiquidityAgent.
 
-        - capacity: effektive Kapazität C_max (wird in PrivateInfo abgelegt)
-        - min_price / max_price: global zulässiger Preisrahmen für diesen Agenten
-        - min_volume / max_volume: Volumengrenzen pro Order
-        - price_band_pi, n_segments, n_orders: Parameter der NaivePricingStrategy
+        WICHTIG (Phase 2):
+        - Die eigentliche PricingStrategy (Naive / MTAA / ...) wird NICHT mehr
+          hier erzeugt, sondern in der Simulation und anschließend dem Agenten
+          zugewiesen:
+              agent.pricing_strategy = strategy
+
+        - Die hier übergebenen Parameter (insbesondere n_orders) steuern nur
+          das agentenspezifische Verhalten (z.B. Ziel-Gesamtvolumen pro Tick).
         """
         priv = AgentPrivateInfo(effective_capacity=capacity)
 
@@ -137,16 +144,6 @@ class RandomLiquidityAgent(Agent):
             price_band_pi=price_band_pi,
             n_segments=n_segments,
             n_orders=n_orders,
-        )
-
-        # Shinde-nahe naive Preisstrategie an den Agenten hängen.
-        agent.pricing_strategy = NaivePricingStrategy(
-            rng=rng,
-            pi_range=price_band_pi,
-            n_segments=n_segments,
-            n_orders=n_orders,
-            min_price=min_price,
-            max_price=max_price,
         )
 
         return agent
