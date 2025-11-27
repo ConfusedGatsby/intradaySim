@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 from typing import Union, List
 
@@ -67,19 +69,12 @@ def run_demo(config: SimulationConfig | None = None):
     # Phase 2: zentrale Preisstrategie erzeugen (aktuell: naive)
     pricing_strategy = create_pricing_strategy(config, rng)
 
-    agents: List[
-        Union[
-            RandomLiquidityAgent,
-            DispatchableAgent,
-            VariableAgent,
-            SimpleTrendAgent,
-        ]
-    ] = []
+    agents = []
     next_id = 1
 
-    # Random-Liquidity-Agents ------------------------------------------------
+    # Random-Liquidity-Agents -----------------------------------------------
     for _ in range(config.n_random_agents):
-        rl_ag = RandomLiquidityAgent.create(
+        ag = RandomLiquidityAgent.create(
             id=next_id,
             rng=rng,
             capacity=100.0,
@@ -91,8 +86,10 @@ def run_demo(config: SimulationConfig | None = None):
             n_segments=config.naive_n_segments,
             n_orders=config.naive_n_orders,
         )
-        rl_ag.pricing_strategy = pricing_strategy
-        agents.append(rl_ag)
+        # Zuweisung der zentral konfigurierten Preisstrategie
+        ag.pricing_strategy = pricing_strategy
+
+        agents.append(ag)
         next_id += 1
 
     # Dispatchable Agents ---------------------------------------------------
@@ -106,7 +103,9 @@ def run_demo(config: SimulationConfig | None = None):
             base_volume=config.dispatchable_base_volume,
             epsilon_price=config.dispatchable_epsilon_price,
         )
+        # zentrale Preisstrategie zuweisen (falls genutzt)
         d_ag.pricing_strategy = pricing_strategy
+
         agents.append(d_ag)
         next_id += 1
 
@@ -120,28 +119,30 @@ def run_demo(config: SimulationConfig | None = None):
             base_volume=config.variable_base_volume,
             imbalance_tolerance=config.variable_imbalance_tolerance,
         )
+        # zentrale Preisstrategie zuweisen (falls genutzt)
         v_ag.pricing_strategy = pricing_strategy
+
         agents.append(v_ag)
         next_id += 1
 
-    # Trend-Agent (optional) ------------------------------------------------
+    # Optionaler Trend-Agent ------------------------------------------------
     if config.use_trend_agent:
         t_ag = SimpleTrendAgent.create(
             id=next_id,
             rng=rng,
-            capacity=50.0,
-            base_volume=2.0,
+            capacity=100.0,
+            base_volume=5.0,
         )
+        # zentrale Preisstrategie zuweisen (falls genutzt)
         t_ag.pricing_strategy = pricing_strategy
+
         agents.append(t_ag)
         next_id += 1
 
     agent_by_id = {ag.id: ag for ag in agents}
 
-    # Marktlog (jetzt mit product_id; Single-Produkt -> immer 0)
     log = {
         "t": [],
-        "product_id": [],
         "best_bid": [],
         "best_ask": [],
         "midprice": [],
@@ -150,11 +151,9 @@ def run_demo(config: SimulationConfig | None = None):
         "trades": [],
     }
 
-    # Agenten-Logs (Multi-Produkt-ready: product_id-Feld ergänzt)
     agent_logs = {
         ag.id: {
             "t": [],
-            "product_id": [],
             "agent_id": ag.id,
             "agent_type": ag.__class__.__name__,
             "position": [],
@@ -172,15 +171,15 @@ def run_demo(config: SimulationConfig | None = None):
     for t in range(config.n_steps):
         trades_this_step = 0
 
-        # 1) Imbalance-Preise bestimmen
-        lambda_up, lambda_down = get_imbalance_prices(t, config)
-
-        # 2) Imbalance und Imbalance-Kosten updaten
+        # 1) Imbalance für alle Agenten aktualisieren
         for ag in agents:
             ag.update_imbalance(t)
+
+        # 2) Imbalance-Kosten anwenden (einfaches exogenes Schema)
+        lambda_up, lambda_down = get_imbalance_prices(t, config)
+        for ag in agents:
             pi = ag.private_info
             delta = pi.imbalance
-
             if delta > 0.0:
                 cost = lambda_up * delta
             elif delta < 0.0:
@@ -188,7 +187,9 @@ def run_demo(config: SimulationConfig | None = None):
             else:
                 cost = 0.0
 
-            # Kein Akkumulieren: „Kosten, wenn JETZT Settlement wäre“
+            # *** WICHTIG: kein Akkumulieren mehr ***
+            # Früher:  pi.imbalance_cost += cost
+            # Jetzt:   „Kosten, wenn JETZT Settlement wäre"
             pi.imbalance_cost = cost
 
         # 3) Agenten-States loggen (nach Imbalance-/Kosten-Update, vor Handel)
@@ -196,7 +197,6 @@ def run_demo(config: SimulationConfig | None = None):
             pi = ag.private_info
             logs = agent_logs[ag.id]
             logs["t"].append(t)
-            logs["product_id"].append(0)  # Single-Produkt: implizit Produkt 0
             logs["position"].append(pi.market_position)
             logs["revenue"].append(pi.revenue)
             logs["imbalance"].append(pi.imbalance)
@@ -206,18 +206,13 @@ def run_demo(config: SimulationConfig | None = None):
             logs["est_imb_price_up"].append(pi.est_imb_price_up)
             logs["est_imb_price_down"].append(pi.est_imb_price_down)
 
-        # 4) Handelsrunde ----------------------------------------------------
+        # Handelsrunde ------------------------------------------------------
         for agent in agents:
             # Cancel-first: alle offenen Orders des Agenten löschen
             mo.cancel_agent_orders(agent.id)
 
-            tob_raw = mo.get_tob()
-            tob = TopOfBook(
-                best_bid_price=tob_raw.get("best_bid_price"),
-                best_bid_volume=None,
-                best_ask_price=tob_raw.get("best_ask_price"),
-                best_ask_volume=None,
-            )
+            # GEÄNDERT: get_tob() gibt jetzt direkt TopOfBook zurück
+            tob = mo.get_tob()
 
             public_info = PublicInfo(
                 tob=tob,
@@ -247,22 +242,20 @@ def run_demo(config: SimulationConfig | None = None):
                     if seller:
                         seller.on_trade(tr.volume, tr.price, side=Side.SELL)
 
-        # 5) Markt-Log und TOB ----------------------------------------------
-        tob_raw = mo.get_tob()
-        bb = tob_raw.get("best_bid_price")
-        ba = tob_raw.get("best_ask_price")
+        # GEÄNDERT: Verwende TopOfBook-Objekt und Methoden
+        tob_end = mo.get_tob()
+        bb = tob_end.best_bid_price
+        ba = tob_end.best_ask_price
 
-        if bb is not None and ba is not None:
-            mid = 0.5 * (bb + ba)
-            spread = ba - bb
-        else:
-            # Fallback: wenn nur eine Seite im Buch ist, am DA-Preis verankern,
-            # damit der Mid nicht auf ein einseitiges Extrem springt.
+        # Verwende midprice() Methode
+        mid = tob_end.midprice()
+        if mid is None:
+            # Fallback: wenn nur eine Seite im Buch ist
             mid = config.da_price
-            spread = None
+        
+        spread = tob_end.spread()
 
         log["t"].append(t)
-        log["product_id"].append(0)  # Single-Produkt: implizit Produkt 0
         log["best_bid"].append(bb)
         log["best_ask"].append(ba)
         log["midprice"].append(mid)

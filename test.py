@@ -1,51 +1,33 @@
-"""Einfacher Test für erweiterte types.py"""
+"""Test für Schritt 3: TopOfBook Integration"""
 
-from intraday_abm.core.types import TopOfBook, PublicInfo
-from intraday_abm.core.product import create_single_product
+from intraday_abm.core.types import TopOfBook
+from intraday_abm.core.order_book import OrderBook
+from intraday_abm.core.market_operator import MarketOperator
 
-def test_topofbook():
-    # Test 1: TopOfBook mit Midprice und Spread
-    tob = TopOfBook(
-        best_bid_price=49.0,
-        best_bid_volume=10.0,
-        best_ask_price=51.0,
-        best_ask_volume=15.0
-    )
+def test_market_operator_tob():
+    # Test: MarketOperator gibt TopOfBook zurück
+    ob = OrderBook(product_id=0)
+    mo = MarketOperator(order_book=ob)
     
-    # Midprice testen
-    assert tob.midprice() == 50.0, f"Midprice sollte 50.0 sein, ist {tob.midprice()}"
-    print(f"✅ Midprice: {tob.midprice()}")
+    tob = mo.get_tob()
     
-    # Spread testen
-    assert tob.spread() == 2.0, f"Spread sollte 2.0 sein, ist {tob.spread()}"
-    print(f"✅ Spread: {tob.spread()}")
+    # Sollte TopOfBook-Objekt sein
+    assert isinstance(tob, TopOfBook), f"Expected TopOfBook, got {type(tob)}"
+    print(f"✅ MarketOperator.get_tob() gibt TopOfBook zurück: {tob}")
     
-    # has_bid/has_ask testen
-    assert tob.has_bid() == True
-    assert tob.has_ask() == True
-    print(f"✅ has_bid() und has_ask() funktionieren")
+    # Sollte None-Werte haben (leeres Buch)
+    assert tob.best_bid_price is None
+    assert tob.best_ask_price is None
+    print(f"✅ Leeres Orderbuch korrekt: bid={tob.best_bid_price}, ask={tob.best_ask_price}")
     
-    # Test 2: Leeres TOB
-    empty_tob = TopOfBook(None, None, None, None)
-    assert empty_tob.midprice() is None
-    assert empty_tob.spread() is None
-    assert empty_tob.has_bid() == False
-    print(f"✅ Leeres TOB behandelt")
-    
-    # Test 3: PublicInfo mit Product
-    product = create_single_product(product_id=0)
-    public_info = PublicInfo(
-        tob=tob,
-        da_price=50.0,
-        product=product
-    )
-    
-    assert public_info.da_price == 50.0
-    assert public_info.time_to_gate_close(100) is not None
-    print(f"✅ PublicInfo mit Product funktioniert")
-    print(f"   Zeit bis Gate-Close bei t=100: {public_info.time_to_gate_close(100)}")
+    # Teste Methoden
+    assert tob.midprice() is None
+    assert tob.spread() is None
+    assert tob.has_bid() == False
+    assert tob.has_ask() == False
+    print(f"✅ TopOfBook-Methoden funktionieren auf leerem Buch")
     
     print("\n🎉 ALLE TESTS BESTANDEN!")
 
 if __name__ == "__main__":
-    test_topofbook()
+    test_market_operator_tob()

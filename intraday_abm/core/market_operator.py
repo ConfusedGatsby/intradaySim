@@ -5,7 +5,7 @@ from typing import List
 
 from intraday_abm.core.order_book import OrderBook
 from intraday_abm.core.order import Order, Trade
-from intraday_abm.core.types import Side, TimeInForce
+from intraday_abm.core.types import Side, TimeInForce, TopOfBook
 
 
 @dataclass
@@ -62,24 +62,22 @@ class MarketOperator:
         """
         self.order_book.remove_orders_by_agent(agent_id)
 
-    def get_tob(self) -> dict:
+    def get_tob(self) -> TopOfBook:
         """
-        Gibt das aktuelle Top-of-Book als einfaches Dict zurück:
-
-        {
-            "best_bid_price": float | None,
-            "best_ask_price": float | None
-        }
-
-        Volumina können bei Bedarf später ergänzt werden.
+        Gibt das aktuelle Top-of-Book als TopOfBook-Objekt zurück.
+        
+        Returns:
+            TopOfBook mit best_bid/ask prices und volumes
         """
         best_bid = self.order_book.best_bid()
         best_ask = self.order_book.best_ask()
 
-        return {
-            "best_bid_price": best_bid.price if best_bid else None,
-            "best_ask_price": best_ask.price if best_ask else None,
-        }
+        return TopOfBook(
+            best_bid_price=best_bid.price if best_bid else None,
+            best_bid_volume=best_bid.volume if best_bid else None,
+            best_ask_price=best_ask.price if best_ask else None,
+            best_ask_volume=best_ask.volume if best_ask else None,
+        )
 
     # ------------------------------------------------------------------
     # Interne Matching-Logik
