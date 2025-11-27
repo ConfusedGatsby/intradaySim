@@ -3,16 +3,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List
 
-from intraday_abm.core.order import Order, Trade
-from intraday_abm.core.multi_product_order_book import MultiProductOrderBook
 from intraday_abm.core.order_book import OrderBook
+from intraday_abm.core.order import Order, Trade
 from intraday_abm.core.types import Side
 
 
 @dataclass
 class MarketOperator:
-    """Verwaltet das Orderbuch und fuehrt Matching aus (Pay-as-Bid, Price-Time-Priority)."""
-
+    """
+    Verwaltet das Orderbuch und führt Matching aus (Pay-as-Bid, Price-Time-Priority).
+    """
     order_book: OrderBook
     next_order_id: int = 1
 
@@ -22,12 +22,7 @@ class MarketOperator:
         order.timestamp = time
         return order
 
-    def _get_book_for_product(self, product_id: int):
-        if isinstance(self.order_book, MultiProductOrderBook):
-            return self.order_book.get_book(product_id)
-        return self.order_book
-
-    # Oeffentliche API ---------------------------------------------------------
+    # Öffentliche API ---------------------------------------------------------
 
     def process_order(self, order: Order, time: int) -> List[Trade]:
         """
@@ -36,41 +31,35 @@ class MarketOperator:
         """
         self._assign_order_id(order, time)
 
-        book = self._get_book_for_product(order.product_id)
-
         if order.side == Side.BUY:
-            trades = self._match_buy(order, time, book)
+            trades = self._match_buy(order, time)
         else:
-            trades = self._match_sell(order, time, book)
+            trades = self._match_sell(order, time)
 
         # Falls noch Restvolumen vorhanden ist und GTC: ins Buch legen
         if order.volume > 0 and order.time_in_force is not None:
             from intraday_abm.core.types import TimeInForce  # vermeiden von Zyklusimport
             if order.time_in_force == TimeInForce.GTC:
-                book.add_order(order)
+                self.order_book.add_order(order)
 
         return trades
 
     def cancel_agent_orders(self, agent_id: int) -> None:
-        """Loescht alle offenen Orders eines Agenten aus dem Orderbuch."""
-        if isinstance(self.order_book, MultiProductOrderBook):
-            for book in self.order_book.books.values():
-                book.remove_orders_by_agent(agent_id)
-        else:
-            self.order_book.remove_orders_by_agent(agent_id)
-
-    def get_tob(self, product_id: int = 0) -> dict:
         """
-        Gibt das aktuelle Top-of-Book als Dict zurueck:
+        Löscht alle offenen Orders eines Agenten aus dem Orderbuch.
+        """
+        self.order_book.remove_orders_by_agent(agent_id)
+
+    def get_tob(self) -> dict:
+        """
+        Gibt das aktuelle Top-of-Book als Dict zurück:
         {
             "best_bid_price": float | None,
             "best_ask_price": float | None
         }
         """
-        book = self._get_book_for_product(product_id)
-
-        best_bid = book.best_bid()
-        best_ask = book.best_ask()
+        best_bid = self.order_book.best_bid()
+        best_ask = self.order_book.best_ask()
 
         return {
             "best_bid_price": best_bid.price if best_bid else None,
@@ -79,9 +68,9 @@ class MarketOperator:
 
     # Interne Matching-Logik --------------------------------------------------
 
-    def _match_buy(self, incoming: Order, time: int, book: OrderBook) -> List[Trade]:
+    def _match_buy(self, incoming: Order, time: int) -> List[Trade]:
         """
-        Matching fuer eingehende Kauforder (BUY).
+        Matching für eingehende Kauforder (BUY).
 
         - matched gegen beste Asks
         - Preis = Preis der liegenden Order (Pay-as-Bid)
@@ -90,7 +79,7 @@ class MarketOperator:
         trades: List[Trade] = []
 
         while incoming.volume > 0:
-            best_ask = book.best_ask()
+            best_ask = self.order_book.best_ask()
             if best_ask is None:
                 break
 
@@ -119,13 +108,13 @@ class MarketOperator:
 
             # Liegende Order ggf. entfernen
             if best_ask.volume <= 0:
-                book.remove_order(best_ask)
+                self.order_book.remove_order(best_ask)
 
         return trades
 
-    def _match_sell(self, incoming: Order, time: int, book: OrderBook) -> List[Trade]:
+    def _match_sell(self, incoming: Order, time: int) -> List[Trade]:
         """
-        Matching fuer eingehende Verkauforder (SELL).
+        Matching für eingehende Verkauforder (SELL).
 
         - matched gegen beste Bids
         - Preis = Preis der liegenden Order (Pay-as-Bid)
@@ -134,7 +123,7 @@ class MarketOperator:
         trades: List[Trade] = []
 
         while incoming.volume > 0:
-            best_bid = book.best_bid()
+            best_bid = self.order_book.best_bid()
             if best_bid is None:
                 break
 
@@ -160,6 +149,6 @@ class MarketOperator:
             best_bid.volume -= traded_volume
 
             if best_bid.volume <= 0:
-                book.remove_order(best_bid)
+                self.order_book.remove_order(best_bid)
 
         return trades

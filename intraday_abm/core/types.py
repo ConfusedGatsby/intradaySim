@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional
 
@@ -29,7 +29,6 @@ class TopOfBook:
     best_bid_volume: Optional[float]
     best_ask_price: Optional[float]
     best_ask_volume: Optional[float]
-    product_id: int = 0
 
 
 @dataclass
@@ -43,7 +42,6 @@ class PublicInfo:
     """
     tob: TopOfBook
     da_price: float
-    product_id: int = 0
 
 
 @dataclass
@@ -66,45 +64,8 @@ class AgentPrivateInfo:
     effective_capacity: float
     da_position: float = 0.0
     market_position: float = 0.0
-    market_position_by_product: dict[int, float] = field(default_factory=dict)
-    da_position_by_product: dict[int, float] = field(default_factory=dict)
     revenue: float = 0.0
     imbalance: float = 0.0
     imbalance_cost: float = 0.0
     est_imb_price_up: float = 0.0
     est_imb_price_down: float = 0.0
-
-    # Multi-Produkt-Zugriff -------------------------------------------------
-    def get_market_position(self, product_id: int = 0) -> float:
-        """
-        Liefert die Marktposition f�r das gegebene Produkt.
-
-        Fallback: wenn keine pro-Produkt-Werte gepflegt sind, wird f�r product_id=0
-        der bestehende single-product Wert genutzt (bestehendes Verhalten bleibt).
-        """
-        if product_id == 0 and not self.market_position_by_product:
-            return self.market_position
-        return self.market_position_by_product.get(product_id, 0.0)
-
-    def set_market_position(self, product_id: int, value: float) -> None:
-        """Setzt die Marktposition f�r ein Produkt und spiegelt product_id=0 auf market_position."""
-        self.market_position_by_product[product_id] = value
-        if product_id == 0:
-            self.market_position = value
-
-    def get_da_position(self, product_id: int = 0) -> float:
-        """
-        Liefert die Day-Ahead-Position f�r das gegebene Produkt.
-
-        Fallback: wenn keine pro-Produkt-Werte gepflegt sind, wird f�r product_id=0
-        der bestehende single-product Wert genutzt (bestehendes Verhalten bleibt).
-        """
-        if product_id == 0 and not self.da_position_by_product:
-            return self.da_position
-        return self.da_position_by_product.get(product_id, 0.0)
-
-    def set_da_position(self, product_id: int, value: float) -> None:
-        """Setzt die DA-Position f�r ein Produkt und spiegelt product_id=0 auf da_position."""
-        self.da_position_by_product[product_id] = value
-        if product_id == 0:
-            self.da_position = value
