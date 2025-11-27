@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -10,9 +10,12 @@ class SimulationConfig:
 
     # Day-Ahead-Preis (als Referenz)
     da_price: float = 50.0
+    n_products: int = 1
+    product_ids: list[int] = field(default_factory=lambda: [0])
+    da_price_curve: list[float] = field(default_factory=lambda: [50.0])
 
     # Random-Liquidity-Agents
-    n_random_agents: int = 100
+    n_random_agents: int = 10
     random_min_price: float = da_price - 20.0
     random_max_price: float = da_price + 20.0
     min_volume: float = 0.3
@@ -31,7 +34,7 @@ class SimulationConfig:
     
 
     # Dispatchable Agents (Thermal)
-    n_dispatchable_agents: int = 5
+    n_dispatchable_agents: int = 3
     dispatchable_capacity: float = 100.0
     dispatchable_da_position: float = 50.0
     dispatchable_marginal_cost: float = 10.0
@@ -40,7 +43,7 @@ class SimulationConfig:
     dispatchable_imbalance_penalty: float = 0.0  # €/MWh Abweichung
 
     # Variable Agents (z.B. Wind/PV)
-    n_variable_agents: int = 10
+    n_variable_agents: int = 5
     variable_capacity: float = 60.0
     variable_base_forecast: float = 20.0
     variable_base_volume: float = 5.0
