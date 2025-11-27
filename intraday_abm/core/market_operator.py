@@ -5,29 +5,41 @@ from typing import List
 
 from intraday_abm.core.order_book import OrderBook
 from intraday_abm.core.order import Order, Trade
-from intraday_abm.core.types import Side
+from intraday_abm.core.types import Side, TimeInForce
 
 
 @dataclass
 class MarketOperator:
     """
-    Verwaltet das Orderbuch und führt Matching aus (Pay-as-Bid, Price-Time-Priority).
+    Verwaltet das Orderbuch und führt Matching aus
+    (Pay-as-Bid, Price-Time-Priority).
+
+    Aktuell ist der MarketOperator noch an ein einzelnes OrderBook
+    gebunden. Über `product_id` im OrderBook und in Order/Trade ist
+    er aber bereits Multi-Produkt-fähig (z.B. ein MO je Produkt oder
+    später via MultiProductOrderBook).
     """
     order_book: OrderBook
     next_order_id: int = 1
 
+    # ------------------------------------------------------------------
+    # Interne Hilfsfunktion: Order-ID & Timestamp setzen
+    # ------------------------------------------------------------------
     def _assign_order_id(self, order: Order, time: int) -> Order:
         order.id = self.next_order_id
         self.next_order_id += 1
         order.timestamp = time
         return order
 
-    # Öffentliche API ---------------------------------------------------------
-
+    # ------------------------------------------------------------------
+    # Öffentliche API
+    # ------------------------------------------------------------------
     def process_order(self, order: Order, time: int) -> List[Trade]:
         """
-        Nimmt eine neue Order entgegen, weist eine ID zu und matched diese
+        Nimmt eine neue Order entgegen, weist eine ID zu und matched sie
         gegen das bestehende Orderbuch.
+
+        Rückgabe: Liste der in diesem Schritt erzeugten Trades.
         """
         self._assign_order_id(order, time)
 
@@ -36,9 +48,8 @@ class MarketOperator:
         else:
             trades = self._match_sell(order, time)
 
-        # Falls noch Restvolumen vorhanden ist und GTC: ins Buch legen
+        # Restvolumen ggf. ins Buch legen (GTC)
         if order.volume > 0 and order.time_in_force is not None:
-            from intraday_abm.core.types import TimeInForce  # vermeiden von Zyklusimport
             if order.time_in_force == TimeInForce.GTC:
                 self.order_book.add_order(order)
 
@@ -47,16 +58,20 @@ class MarketOperator:
     def cancel_agent_orders(self, agent_id: int) -> None:
         """
         Löscht alle offenen Orders eines Agenten aus dem Orderbuch.
+        (A2: 'cancel-first' Mechanismus).
         """
         self.order_book.remove_orders_by_agent(agent_id)
 
     def get_tob(self) -> dict:
         """
-        Gibt das aktuelle Top-of-Book als Dict zurück:
+        Gibt das aktuelle Top-of-Book als einfaches Dict zurück:
+
         {
             "best_bid_price": float | None,
             "best_ask_price": float | None
         }
+
+        Volumina können bei Bedarf später ergänzt werden.
         """
         best_bid = self.order_book.best_bid()
         best_ask = self.order_book.best_ask()
@@ -66,8 +81,9 @@ class MarketOperator:
             "best_ask_price": best_ask.price if best_ask else None,
         }
 
-    # Interne Matching-Logik --------------------------------------------------
-
+    # ------------------------------------------------------------------
+    # Interne Matching-Logik
+    # ------------------------------------------------------------------
     def _match_buy(self, incoming: Order, time: int) -> List[Trade]:
         """
         Matching für eingehende Kauforder (BUY).
@@ -77,6 +93,7 @@ class MarketOperator:
         - FIFO innerhalb eines Preislevels (durch OrderBook sichergestellt)
         """
         trades: List[Trade] = []
+        product_id = self.order_book.product_id
 
         while incoming.volume > 0:
             best_ask = self.order_book.best_ask()
@@ -90,8 +107,8 @@ class MarketOperator:
             traded_volume = min(incoming.volume, best_ask.volume)
             trade_price = best_ask.price  # Pay-as-Bid -> Preis der liegenden Order
 
-            # Trade-Objekt mit Order- und Agent-IDs
             tr = Trade(
+                product_id=product_id,
                 price=trade_price,
                 volume=traded_volume,
                 buy_order_id=incoming.id,
@@ -114,13 +131,14 @@ class MarketOperator:
 
     def _match_sell(self, incoming: Order, time: int) -> List[Trade]:
         """
-        Matching für eingehende Verkauforder (SELL).
+        Matching für eingehende Verkaufsorder (SELL).
 
         - matched gegen beste Bids
         - Preis = Preis der liegenden Order (Pay-as-Bid)
         - FIFO innerhalb eines Preislevels (durch OrderBook sichergestellt)
         """
         trades: List[Trade] = []
+        product_id = self.order_book.product_id
 
         while incoming.volume > 0:
             best_bid = self.order_book.best_bid()
@@ -135,6 +153,7 @@ class MarketOperator:
             trade_price = best_bid.price  # Pay-as-Bid -> Preis der liegenden Order
 
             tr = Trade(
+                product_id=product_id,
                 price=trade_price,
                 volume=traded_volume,
                 buy_order_id=best_bid.id,
