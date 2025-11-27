@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from intraday_abm.agents.base import Agent
-from intraday_abm.core.types import Side, PublicInfo, AgentPrivateInfo
+from intraday_abm.core.types import Side, PublicInfo, AgentPrivateInfo, TimeInForce
 from intraday_abm.core.order import Order
 
 
@@ -62,6 +62,7 @@ class SimpleTrendAgent(Agent):
             price=price,
             volume=volume,
             product_id=0,
+            time_in_force=TimeInForce.GTC,
         )
 
     @classmethod
