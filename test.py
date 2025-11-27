@@ -1,268 +1,431 @@
-from intraday_abm.core.product import create_single_product, ProductStatus
-from intraday_abm.core.product_aware_order_book import ProductAwareOrderBook
+"""
+Test für Schritt 5: MultiProductMarketOperator
+
+Testet:
+- Erstellung von MultiProductMarketOperator
+- Produkt-Lifecycle-Management
+- Order-Routing zu korrekten Produkten
+- Multi-Product Order-Cancellation
+- Public Info Abfrage für mehrere Produkte
+"""
+
+from intraday_abm.core.product import create_hourly_products, create_single_product, ProductStatus
+from intraday_abm.core.multi_product_market_operator import MultiProductMarketOperator
 from intraday_abm.core.order import Order
 from intraday_abm.core.types import Side, TimeInForce
 
 
-def test_product_aware_order_book_basic():
-    """Test grundlegende Funktionalität."""
-    print("\n=== Test 1: Grundlegende Funktionalität ===")
+def test_create_multi_product_mo():
+    """Test Erstellung von MultiProductMarketOperator."""
+    print("\n=== Test 1: MultiProductMarketOperator erstellen ===")
     
-    # Erstelle Produkt
-    product = create_single_product(
-        product_id=0,
-        delivery_start=1440,
-        gate_open_offset_hours=24,
-        gate_close_offset_minutes=60,
-        da_price=50.0
-    )
-    
-    # Öffne das Produkt
-    product = product.update_status(ProductStatus.OPEN)
-    
-    # Erstelle OrderBook
-    ob = ProductAwareOrderBook(product=product)
-    
-    print(f"✅ ProductAwareOrderBook erstellt: {ob}")
-    assert ob.product.product_id == 0
-    assert len(ob) == 0
-    print(f"✅ Leeres Buch: {len(ob)} Orders")
-
-
-def test_is_open_validation():
-    """Test is_open() und validate_order_time()."""
-    print("\n=== Test 2: is_open() Validierung ===")
-    
-    product = create_single_product(
-        product_id=0,
-        delivery_start=1440,
+    # Erstelle 3 Produkte
+    products = create_hourly_products(
+        n_hours=3,
+        start_time=1440,
         gate_open_offset_hours=24,
         gate_close_offset_minutes=60
     )
     
-    # gate_open = 1440 - 24*60 = 0
-    # gate_close = 1440 - 60 = 1380
+    mo = MultiProductMarketOperator.from_products(products)
     
-    # Status PENDING: nicht offen
-    ob = ProductAwareOrderBook(product=product)
-    assert ob.is_open(100) == False
-    print(f"✅ PENDING Status: is_open(100) = False")
+    assert len(mo.products) == 3
+    assert len(mo.order_books) == 3
+    print(f"✅ MultiProductMarketOperator mit {len(mo.products)} Produkten erstellt")
     
-    # Status OPEN: innerhalb Fenster offen
-    product_open = product.update_status(ProductStatus.OPEN)
-    ob = ProductAwareOrderBook(product=product_open)
-    assert ob.is_open(100) == True
-    print(f"✅ OPEN Status: is_open(100) = True")
-    
-    # Außerhalb Gate-Close: nicht offen
-    assert ob.is_open(1400) == False
-    print(f"✅ Nach Gate-Close: is_open(1400) = False")
-    
-    # Status CLOSED: nicht offen
-    product_closed = product_open.update_status(ProductStatus.CLOSED)
-    ob = ProductAwareOrderBook(product=product_closed)
-    assert ob.is_open(100) == False
-    print(f"✅ CLOSED Status: is_open(100) = False")
+    # Überprüfe, dass alle Produkte im Status PENDING sind
+    for product_id, product in mo.products.items():
+        assert product.status == ProductStatus.PENDING
+    print(f"✅ Alle Produkte im Status PENDING")
 
 
-def test_add_order():
-    """Test add_order mit und ohne Validierung."""
-    print("\n=== Test 3: add_order() ===")
+def test_open_products():
+    """Test open_products() Methode."""
+    print("\n=== Test 2: open_products() ===")
     
-    product = create_single_product(product_id=0)
-    product = product.update_status(ProductStatus.OPEN)
-    ob = ProductAwareOrderBook(product=product)
+    # Erstelle Produkte mit GLEICHER delivery_start aber unterschiedlichen IDs
+    products = []
+    for i in range(3):
+        product = create_single_product(
+            product_id=i,
+            delivery_start=1440,  # GLEICHE Lieferzeit für alle!
+            delivery_duration=60,
+            gate_open_offset_hours=24,  # Alle öffnen gleichzeitig
+            gate_close_offset_minutes=60,
+            da_price=50.0
+        )
+        products.append(product)
     
-    # Order erstellen
-    order = Order(
-        id=1,
+    mo = MultiProductMarketOperator.from_products(products)
+    
+    # Alle sollten gate_open bei (1440 - 24*60) = 0 haben
+    for pid, product in mo.products.items():
+        assert product.gate_open == 0, f"Product {pid} has gate_open={product.gate_open}, expected 0"
+    
+    # Öffne Produkte bei t=0
+    opened = mo.open_products(t=0)
+    
+    assert len(opened) == 3
+    print(f"✅ {len(opened)} Produkte geöffnet")
+    
+    # Alle Produkte sollten jetzt OPEN sein
+    for product_id in opened:
+        product = mo.products[product_id]
+        assert product.status == ProductStatus.OPEN
+    print(f"✅ Alle Produkte haben Status OPEN")
+
+
+def test_open_products_staggered():
+    """Test open_products() mit gestaffelten Öffnungszeiten."""
+    print("\n=== Test 2b: open_products() gestaffelt ===")
+    
+    products = create_hourly_products(
+        n_hours=3,
+        start_time=1440,
+        gate_open_offset_hours=24,
+        gate_close_offset_minutes=60
+    )
+    mo = MultiProductMarketOperator.from_products(products)
+    
+    # Bei t=0 sollte nur Produkt 0 öffnen (gate_open=0)
+    opened = mo.open_products(t=0)
+    assert len(opened) == 1
+    assert 0 in opened
+    print(f"✅ Bei t=0: Produkt 0 geöffnet")
+    
+    # Bei t=60 sollte Produkt 1 öffnen (gate_open=60)
+    opened = mo.open_products(t=60)
+    assert len(opened) == 1
+    assert 1 in opened
+    print(f"✅ Bei t=60: Produkt 1 geöffnet")
+    
+    # Bei t=120 sollte Produkt 2 öffnen (gate_open=120)
+    opened = mo.open_products(t=120)
+    assert len(opened) == 1
+    assert 2 in opened
+    print(f"✅ Bei t=120: Produkt 2 geöffnet")
+
+
+def test_get_open_products():
+    """Test get_open_products()."""
+    print("\n=== Test 3: get_open_products() ===")
+    
+    products = []
+    for i in range(3):
+        product = create_single_product(
+            product_id=i,
+            delivery_start=1440,  # GLEICHE Lieferzeit
+            gate_open_offset_hours=24,
+            gate_close_offset_minutes=60
+        )
+        products.append(product)
+    
+    mo = MultiProductMarketOperator.from_products(products)
+    mo.open_products(t=0)
+    
+    # Alle sollten offen sein bei t=100
+    open_pids = mo.get_open_products(t=100)
+    assert len(open_pids) == 3
+    print(f"✅ {len(open_pids)} Produkte offen bei t=100")
+    
+    # gate_close für alle: (1440 - 60) = 1380
+    # Bei t=1400 sollten alle geschlossen sein
+    open_pids = mo.get_open_products(t=1400)
+    assert len(open_pids) == 0
+    print(f"✅ Alle Produkte geschlossen bei t=1400")
+
+
+def test_update_product_status():
+    """Test update_product_status() - automatisches Schließen."""
+    print("\n=== Test 4: update_product_status() ===")
+    
+    products = []
+    for i in range(2):
+        product = create_single_product(
+            product_id=i,
+            delivery_start=1440 + i * 60,  # Unterschiedliche Lieferzeiten
+            gate_open_offset_hours=24,
+            gate_close_offset_minutes=60
+        )
+        products.append(product)
+    
+    mo = MultiProductMarketOperator.from_products(products)
+    
+    # Öffne beide Produkte
+    mo.open_products(t=0)  # Produkt 0 öffnet
+    mo.open_products(t=60)  # Produkt 1 öffnet
+    
+    # Produkt 0: gate_close = 1380
+    # Produkt 1: gate_close = 1440
+    
+    # Bei t=1380 sollte Produkt 0 geschlossen werden
+    closed = mo.update_product_status(t=1380)
+    
+    assert 0 in closed
+    assert mo.products[0].status == ProductStatus.CLOSED
+    print(f"✅ Produkt 0 automatisch geschlossen bei t=1380")
+    
+    # Produkt 1 sollte noch offen sein
+    assert mo.products[1].status == ProductStatus.OPEN
+    print(f"✅ Produkt 1 noch offen")
+
+
+def test_process_order_routing():
+    """Test process_order() - Order-Routing."""
+    print("\n=== Test 5: process_order() - Routing ===")
+    
+    products = []
+    for i in range(3):
+        product = create_single_product(
+            product_id=i,
+            delivery_start=1440,  # GLEICHE Lieferzeit
+            gate_open_offset_hours=24
+        )
+        products.append(product)
+    
+    mo = MultiProductMarketOperator.from_products(products)
+    mo.open_products(t=0)
+    
+    # Order für Produkt 0
+    order_p0 = Order(
+        id=0,  # Wird zugewiesen
         agent_id=1,
         side=Side.BUY,
         price=49.0,
         volume=10.0,
         product_id=0,
-        time_in_force=TimeInForce.GTC,
-        timestamp=100
-    )
-    
-    # Ohne Validierung hinzufügen
-    ob.add_order(order, validate_time=False)
-    assert len(ob) == 1
-    print(f"✅ Order ohne Validierung hinzugefügt: {len(ob)} Orders")
-    
-    # Mit Validierung hinzufügen (sollte funktionieren, da OPEN)
-    order2 = Order(
-        id=2,
-        agent_id=1,
-        side=Side.SELL,
-        price=51.0,
-        volume=15.0,
-        product_id=0,
-        time_in_force=TimeInForce.GTC,
-        timestamp=100
-    )
-    ob.add_order(order2, validate_time=True, t=100)
-    assert len(ob) == 2
-    print(f"✅ Order mit Validierung hinzugefügt: {len(ob)} Orders")
-    
-    # Falsches product_id sollte Fehler werfen
-    wrong_order = Order(
-        id=3,
-        agent_id=2,
-        side=Side.BUY,
-        price=50.0,
-        volume=5.0,
-        product_id=999,  # Falsches Produkt!
         time_in_force=TimeInForce.GTC
     )
     
-    try:
-        ob.add_order(wrong_order)
-        assert False, "Sollte ValueError werfen"
-    except ValueError as e:
-        print(f"✅ Falsches product_id erkannt: {e}")
+    trades = mo.process_order(order_p0, t=100)
+    
+    # Keine Trades (keine Gegenseite)
+    assert len(trades) == 0
+    print(f"✅ Order für Produkt 0 verarbeitet, keine Trades")
+    
+    # Order sollte im Buch von Produkt 0 sein
+    ob_0 = mo.order_books[0]
+    assert len(ob_0) == 1
+    print(f"✅ Order in OrderBook von Produkt 0: {len(ob_0)} Orders")
+    
+    # Order für Produkt 1
+    order_p1 = Order(
+        id=0,
+        agent_id=2,
+        side=Side.SELL,
+        price=51.0,
+        volume=15.0,
+        product_id=1,
+        time_in_force=TimeInForce.GTC
+    )
+    
+    trades = mo.process_order(order_p1, t=100)
+    
+    # Sollte in Produkt 1 sein
+    ob_1 = mo.order_books[1]
+    assert len(ob_1) == 1
+    print(f"✅ Order in OrderBook von Produkt 1: {len(ob_1)} Orders")
+    
+    # Produkt 2 sollte leer sein
+    ob_2 = mo.order_books[2]
+    assert len(ob_2) == 0
+    print(f"✅ OrderBook von Produkt 2 leer: {len(ob_2)} Orders")
 
 
-def test_best_bid_ask():
-    """Test best_bid() und best_ask()."""
-    print("\n=== Test 4: best_bid() und best_ask() ===")
+def test_matching_across_products():
+    """Test Matching innerhalb eines Produkts."""
+    print("\n=== Test 6: Matching innerhalb Produkt ===")
     
-    product = create_single_product(product_id=0)
-    product = product.update_status(ProductStatus.OPEN)
-    ob = ProductAwareOrderBook(product=product)
+    products = []
+    for i in range(2):
+        product = create_single_product(
+            product_id=i,
+            delivery_start=1440  # GLEICHE Lieferzeit
+        )
+        products.append(product)
     
-    # Füge mehrere Orders hinzu
-    orders = [
-        Order(1, 1, Side.BUY, 49.0, 10.0, 0, TimeInForce.GTC, 100),
-        Order(2, 1, Side.BUY, 48.0, 5.0, 0, TimeInForce.GTC, 101),
-        Order(3, 2, Side.SELL, 51.0, 15.0, 0, TimeInForce.GTC, 102),
-        Order(4, 2, Side.SELL, 52.0, 20.0, 0, TimeInForce.GTC, 103),
-    ]
+    mo = MultiProductMarketOperator.from_products(products)
+    mo.open_products(t=0)
     
-    for order in orders:
-        ob.add_order(order)
+    # Resting order in Produkt 0: SELL 51.0
+    resting = Order(
+        id=0,
+        agent_id=1,
+        side=Side.SELL,
+        price=51.0,
+        volume=10.0,
+        product_id=0,
+        time_in_force=TimeInForce.GTC
+    )
+    mo.process_order(resting, t=100)
     
-    # Best bid sollte 49.0 sein (höchster Preis)
-    best_bid = ob.best_bid()
-    assert best_bid is not None
-    assert best_bid.price == 49.0
-    print(f"✅ best_bid: {best_bid.price}")
+    # Incoming order in Produkt 0: BUY 52.0 (crosses)
+    incoming = Order(
+        id=0,
+        agent_id=2,
+        side=Side.BUY,
+        price=52.0,
+        volume=10.0,
+        product_id=0,
+        time_in_force=TimeInForce.GTC
+    )
+    trades = mo.process_order(incoming, t=101)
     
-    # Best ask sollte 51.0 sein (niedrigster Preis)
-    best_ask = ob.best_ask()
-    assert best_ask is not None
-    assert best_ask.price == 51.0
-    print(f"✅ best_ask: {best_ask.price}")
-
-
-def test_remove_orders_by_agent():
-    """Test remove_orders_by_agent()."""
-    print("\n=== Test 5: remove_orders_by_agent() ===")
-    
-    product = create_single_product(product_id=0)
-    product = product.update_status(ProductStatus.OPEN)
-    ob = ProductAwareOrderBook(product=product)
-    
-    # Agent 1: 3 Orders
-    # Agent 2: 2 Orders
-    orders = [
-        Order(1, 1, Side.BUY, 49.0, 10.0, 0, TimeInForce.GTC, 100),
-        Order(2, 1, Side.BUY, 48.0, 5.0, 0, TimeInForce.GTC, 101),
-        Order(3, 1, Side.SELL, 51.0, 15.0, 0, TimeInForce.GTC, 102),
-        Order(4, 2, Side.BUY, 47.0, 20.0, 0, TimeInForce.GTC, 103),
-        Order(5, 2, Side.SELL, 52.0, 25.0, 0, TimeInForce.GTC, 104),
-    ]
-    
-    for order in orders:
-        ob.add_order(order)
-    
-    assert len(ob) == 5
-    print(f"✅ 5 Orders hinzugefügt: {len(ob)} Orders")
-    
-    # Entferne alle Orders von Agent 1
-    removed = ob.remove_orders_by_agent(agent_id=1)
-    assert removed == 3
-    assert len(ob) == 2
-    print(f"✅ {removed} Orders von Agent 1 entfernt, {len(ob)} übrig")
-    
-    # Übrige Orders sollten nur von Agent 2 sein
-    for price_level in list(ob.bids.values()) + list(ob.asks.values()):
-        for order in price_level:
-            assert order.agent_id == 2
-
-
-def test_matching():
-    """Test match_order() Logik."""
-    print("\n=== Test 6: match_order() ===")
-    
-    product = create_single_product(product_id=0)
-    product = product.update_status(ProductStatus.OPEN)
-    ob = ProductAwareOrderBook(product=product)
-    
-    # Resting order: SELL 51.0, 10 MW
-    resting = Order(1, 1, Side.SELL, 51.0, 10.0, 0, TimeInForce.GTC, 100)
-    ob.add_order(resting)
-    
-    # Incoming order: BUY 52.0, 15 MW (crosses!)
-    incoming = Order(2, 2, Side.BUY, 52.0, 15.0, 0, TimeInForce.GTC, 101)
-    
-    trades = ob.match_order(incoming, t=101)
-    
-    # Sollte einen Trade geben: 10 MW @ 51.0 (pay-as-bid)
+    # Sollte matchen
     assert len(trades) == 1
     assert trades[0].volume == 10.0
-    assert trades[0].price == 51.0  # Preis der liegenden Order
-    print(f"✅ Trade ausgeführt: {trades[0].volume} MW @ {trades[0].price}")
+    assert trades[0].price == 51.0
+    assert trades[0].product_id == 0
+    print(f"✅ Trade in Produkt 0: {trades[0].volume} MW @ {trades[0].price}")
     
-    # Resting order sollte entfernt sein
-    assert len(ob) == 0
-    print(f"✅ Resting order entfernt, Buch leer")
-    
-    # Incoming order sollte 5 MW übrig haben
-    assert incoming.volume == 5.0
-    print(f"✅ Incoming order hat noch {incoming.volume} MW übrig")
+    # Buch sollte leer sein
+    assert len(mo.order_books[0]) == 0
+    print(f"✅ OrderBook 0 nach Match leer")
 
 
-def test_clear_all_orders():
-    """Test clear_all_orders() (Gate-Close)."""
-    print("\n=== Test 7: clear_all_orders() ===")
+def test_cancel_agent_orders():
+    """Test cancel_agent_orders() über mehrere Produkte."""
+    print("\n=== Test 7: cancel_agent_orders() ===")
     
-    product = create_single_product(product_id=0)
-    product = product.update_status(ProductStatus.OPEN)
-    ob = ProductAwareOrderBook(product=product)
+    products = []
+    for i in range(3):
+        product = create_single_product(
+            product_id=i,
+            delivery_start=1440  # GLEICHE Lieferzeit
+        )
+        products.append(product)
+    
+    mo = MultiProductMarketOperator.from_products(products)
+    mo.open_products(t=0)
+    
+    # Agent 1: Orders in Produkt 0, 1, 2
+    orders = [
+        Order(0, 1, Side.BUY, 49.0, 10.0, 0, TimeInForce.GTC),
+        Order(0, 1, Side.BUY, 48.0, 5.0, 1, TimeInForce.GTC),
+        Order(0, 1, Side.SELL, 51.0, 15.0, 2, TimeInForce.GTC),
+    ]
+    
+    for order in orders:
+        mo.process_order(order, t=100)
+    
+    assert mo.total_orders() == 3
+    print(f"✅ {mo.total_orders()} Orders von Agent 1 platziert")
+    
+    # Lösche alle Orders von Agent 1
+    cancelled = mo.cancel_agent_orders(agent_id=1)
+    
+    assert cancelled == 3
+    assert mo.total_orders() == 0
+    print(f"✅ {cancelled} Orders von Agent 1 gelöscht")
+    
+    # Teste produkt-spezifische Löschung
+    orders2 = [
+        Order(0, 2, Side.BUY, 49.0, 10.0, 0, TimeInForce.GTC),
+        Order(0, 2, Side.BUY, 48.0, 5.0, 1, TimeInForce.GTC),
+    ]
+    for order in orders2:
+        mo.process_order(order, t=100)
+    
+    # Lösche nur in Produkt 0
+    cancelled = mo.cancel_agent_orders(agent_id=2, product_id=0)
+    assert cancelled == 1
+    assert len(mo.order_books[0]) == 0
+    assert len(mo.order_books[1]) == 1
+    print(f"✅ Produkt-spezifische Löschung funktioniert")
+
+
+def test_get_public_info():
+    """Test get_public_info() für mehrere Produkte."""
+    print("\n=== Test 8: get_public_info() ===")
+    
+    products = []
+    for i in range(3):
+        product = create_single_product(
+            product_id=i,
+            delivery_start=1440  # GLEICHE Lieferzeit
+        )
+        products.append(product)
+    
+    mo = MultiProductMarketOperator.from_products(products)
+    mo.open_products(t=0)
     
     # Füge Orders hinzu
     orders = [
-        Order(1, 1, Side.BUY, 49.0, 10.0, 0),
-        Order(2, 1, Side.SELL, 51.0, 15.0, 0),
-        Order(3, 2, Side.BUY, 48.0, 20.0, 0),
+        Order(0, 1, Side.BUY, 49.0, 10.0, 0, TimeInForce.GTC),
+        Order(0, 1, Side.SELL, 51.0, 15.0, 0, TimeInForce.GTC),
+        Order(0, 2, Side.BUY, 48.0, 5.0, 1, TimeInForce.GTC),
     ]
     for order in orders:
-        ob.add_order(order)
+        mo.process_order(order, t=100)
     
-    assert len(ob) == 3
-    print(f"✅ 3 Orders im Buch")
+    # Hole Public Info für alle offenen Produkte
+    public_info = mo.get_public_info(t=100)
     
-    # Lösche alle
-    cleared = ob.clear_all_orders()
-    assert cleared == 3
-    assert len(ob) == 0
-    print(f"✅ {cleared} Orders gelöscht, Buch leer")
+    assert len(public_info) == 3
+    print(f"✅ Public Info für {len(public_info)} Produkte")
+    
+    # Überprüfe Produkt 0
+    info_0 = public_info[0]
+    assert info_0.tob.best_bid_price == 49.0
+    assert info_0.tob.best_ask_price == 51.0
+    assert info_0.product.product_id == 0
+    print(f"✅ Produkt 0: bid={info_0.tob.best_bid_price}, ask={info_0.tob.best_ask_price}")
+    
+    # Hole Public Info nur für bestimmte Produkte
+    public_info_subset = mo.get_public_info(t=100, product_ids=[0, 1])
+    assert len(public_info_subset) == 2
+    assert 2 not in public_info_subset
+    print(f"✅ Subset-Abfrage funktioniert")
+
+
+def test_gate_close_clears_orders():
+    """Test dass update_product_status Orders löscht bei Gate-Close."""
+    print("\n=== Test 9: Gate-Close löscht Orders ===")
+    
+    product = create_single_product(
+        product_id=0,
+        delivery_start=1440,
+        gate_close_offset_minutes=60
+    )
+    
+    mo = MultiProductMarketOperator.from_products([product])
+    mo.open_products(t=0)
+    
+    # Füge Orders hinzu
+    orders = [
+        Order(0, 1, Side.BUY, 49.0, 10.0, 0, TimeInForce.GTC),
+        Order(0, 1, Side.SELL, 51.0, 15.0, 0, TimeInForce.GTC),
+    ]
+    for order in orders:
+        mo.process_order(order, t=100)
+    
+    assert len(mo.order_books[0]) == 2
+    print(f"✅ 2 Orders im Buch vor Gate-Close")
+    
+    # gate_close = 1440 - 60 = 1380
+    closed = mo.update_product_status(t=1380)
+    
+    assert 0 in closed
+    assert len(mo.order_books[0]) == 0
+    print(f"✅ Alle Orders gelöscht bei Gate-Close")
 
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("PRODUKTAWARE ORDERBOOK TESTS")
+    print("MULTI-PRODUCT MARKET OPERATOR TESTS")
     print("=" * 60)
     
-    test_product_aware_order_book_basic()
-    test_is_open_validation()
-    test_add_order()
-    test_best_bid_ask()
-    test_remove_orders_by_agent()
-    test_matching()
-    test_clear_all_orders()
+    test_create_multi_product_mo()
+    test_open_products()
+    test_open_products_staggered()
+    test_get_open_products()
+    test_update_product_status()
+    test_process_order_routing()
+    test_matching_across_products()
+    test_cancel_agent_orders()
+    test_get_public_info()
+    test_gate_close_clears_orders()
     
     print("\n" + "=" * 60)
-    print("🎉 ALLE TESTS BESTANDEN!")
+    print("🎉 ALLE 10 TESTS BESTANDEN!")
     print("=" * 60)
