@@ -185,22 +185,23 @@ def run_multi_product_simulation(
                             
                             # Update agent state
                             for trade in trades:
-                                side = trade.buy_order_id == order.id  # False = seller
-                                trade_side = trade.side if side else (
-                                    trade.side.opposite() if hasattr(trade.side, 'opposite') 
-                                    else trade.side
-                                )
-                                
-                                # Determine actual side for this agent
                                 from intraday_abm.core.types import Side
-                                actual_side = Side.BUY if trade.buyer_id == agent.id else Side.SELL
                                 
-                                agent.on_trade(
-                                    volume=trade.volume,
-                                    price=trade.price,
-                                    side=actual_side,
-                                    product_id=trade.product_id
-                                )
+                                # Determine which side the agent was on
+                                if trade.buyer_id == agent.id:
+                                    agent.on_trade(
+                                        volume=trade.volume,
+                                        price=trade.price,
+                                        side=Side.BUY,
+                                        product_id=trade.product_id
+                                    )
+                                elif trade.seller_id == agent.id:
+                                    agent.on_trade(
+                                        volume=trade.volume,
+                                        price=trade.price,
+                                        side=Side.SELL,
+                                        product_id=trade.product_id
+                                    )
                                 
                                 step_trades.append(trade)
                                 step_volume += trade.volume
@@ -245,13 +246,19 @@ def run_multi_product_simulation(
                         # Update agent state (single-product style)
                         for trade in trades:
                             from intraday_abm.core.types import Side
-                            actual_side = Side.BUY if trade.buyer_id == agent.id else Side.SELL
                             
-                            agent.on_trade(
-                                volume=trade.volume,
-                                price=trade.price,
-                                side=actual_side
-                            )
+                            if trade.buyer_id == agent.id:
+                                agent.on_trade(
+                                    volume=trade.volume,
+                                    price=trade.price,
+                                    side=Side.BUY
+                                )
+                            elif trade.seller_id == agent.id:
+                                agent.on_trade(
+                                    volume=trade.volume,
+                                    price=trade.price,
+                                    side=Side.SELL
+                                )
                             
                             step_trades.append(trade)
                             step_volume += trade.volume
