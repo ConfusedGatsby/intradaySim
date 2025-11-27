@@ -217,11 +217,13 @@ def run_demo(config: SimulationConfig | None = None):
                 best_bid_volume=None,
                 best_ask_price=tob_raw.get("best_ask_price"),
                 best_ask_volume=None,
+                product_id=0,
             )
 
             public_info = PublicInfo(
                 tob=tob,
                 da_price=config.da_price,
+                product_id=0,
             )
 
             decision: Union[None, Order, List[Order]] = agent.decide_order(t, public_info)

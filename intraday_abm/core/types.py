@@ -29,6 +29,7 @@ class TopOfBook:
     best_bid_volume: Optional[float]
     best_ask_price: Optional[float]
     best_ask_volume: Optional[float]
+    product_id: int = 0
 
 
 @dataclass
@@ -42,6 +43,7 @@ class PublicInfo:
     """
     tob: TopOfBook
     da_price: float
+    product_id: int = 0
 
 
 @dataclass
