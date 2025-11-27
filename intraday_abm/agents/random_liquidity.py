@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 from intraday_abm.agents.base import Agent
-from intraday_abm.core.types import Side, PublicInfo, AgentPrivateInfo
+from intraday_abm.core.types import Side, PublicInfo, AgentPrivateInfo, TimeInForce
 from intraday_abm.core.order import Order
 
 
@@ -96,6 +96,7 @@ class RandomLiquidityAgent(Agent):
                 price=price,
                 volume=volume,
                 product_id=0,
+                time_in_force=TimeInForce.GTC,
             )
             orders.append(order)
 
