@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -10,6 +10,9 @@ class SimulationConfig:
 
     # Day-Ahead-Preis (als Referenz)
     da_price: float = 50.0
+    n_products: int = 1
+    product_ids: list[int] = field(default_factory=lambda: [0])
+    da_price_curve: list[float] = field(default_factory=lambda: [50.0])
 
     # Random-Liquidity-Agents
     n_random_agents: int = 10
