@@ -2,10 +2,37 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Union
+import sys
 
 from intraday_abm.agents.base import Agent
 from intraday_abm.core.types import Side, PublicInfo, AgentPrivateInfo
 from intraday_abm.core.order import Order
+
+
+# Global debug file handle
+_debug_file = None
+
+
+def set_debug_file(filepath: str):
+    """Set the debug output file."""
+    global _debug_file
+    _debug_file = open(filepath, 'w', encoding='utf-8')
+
+
+def close_debug_file():
+    """Close the debug output file."""
+    global _debug_file
+    if _debug_file:
+        _debug_file.close()
+        _debug_file = None
+
+
+def debug_print(msg: str):
+    """Print to debug file if set, otherwise do nothing."""
+    global _debug_file
+    if _debug_file:
+        _debug_file.write(msg + '\n')
+        _debug_file.flush()
 
 
 @dataclass
@@ -32,7 +59,7 @@ class RandomLiquidityAgent(Agent):
     
     **Multi-Product Verhalten:**
     - Platziert Orders in ALLEN offenen Produkten
-    - Unabhängige zufällige Sides pro Produkt
+    - **GARANTIERT 50/50 Split zwischen BUY und SELL** (Fix für Liquidität!)
     - Gleiche Volumen-Parameter für alle Produkte
     - Keine Imbalance (liefert nur Liquidität)
     
@@ -72,7 +99,8 @@ class RandomLiquidityAgent(Agent):
         1. Gesamtvolumen abschätzen, das der Agent in diesem Tick bereitstellen
            möchte (auf Basis von min/max_volume und n_orders).
         2. Über die PricingStrategy eine diskrete Price-Volume-Curve erzeugen.
-        3. Für jedes Preis-Volumen-Paar eine Order mit zufälliger Side erzeugen.
+        3. Für jedes Preis-Volumen-Paar eine Order erzeugen.
+        4. **GARANTIERT 50/50 Split zwischen BUY und SELL Orders.**
         
         Args:
             t: Current simulation time
@@ -82,11 +110,16 @@ class RandomLiquidityAgent(Agent):
             List of Orders or None
         """
 
+        # DEBUG
+        debug_print(f"🔍 DEBUG Agent {self.id} decide_order() called at t={t}")
+
         # Fallback: wenn keine Strategy gesetzt ist, keine Aktivität
         if self.pricing_strategy is None:
+            debug_print(f"   ❌ Agent {self.id}: pricing_strategy is None!")
             return None
 
         if self.n_orders <= 0:
+            debug_print(f"   ❌ Agent {self.id}: n_orders={self.n_orders} <= 0")
             return None
 
         # Einfacher Ansatz: Gesamtvolumen = erwarteter Mittelwert aller Orders
@@ -94,11 +127,16 @@ class RandomLiquidityAgent(Agent):
         total_volume = avg_volume * self.n_orders
 
         if total_volume <= 0.0:
+            debug_print(f"   ❌ Agent {self.id}: total_volume={total_volume} <= 0")
             return None
 
+        debug_print(f"   ✅ Agent {self.id}: total_volume={total_volume:.2f}")
+
         # Die Preisstrategie erzeugt eine diskrete Price-Volume-Kurve.
-        # Hinweis: Für die Referenzpreis-Bestimmung ist bei vorhandenem Bid & Ask
-        # die Side hier irrelevant (Midprice). Wir geben BUY mit.
+        debug_print(f"   📊 Agent {self.id}: Calling build_price_volume_curve()...")
+        debug_print(f"      public_info.tob = {public_info.tob}")
+        debug_print(f"      public_info.da_price = {public_info.da_price}")
+        
         curve = self.pricing_strategy.build_price_volume_curve(
             agent=self,
             public_info=public_info,
@@ -106,30 +144,76 @@ class RandomLiquidityAgent(Agent):
             total_volume=total_volume,
         )
 
+        debug_print(f"   📈 Agent {self.id}: Curve returned {len(curve) if curve else 0} price points")
+        if curve:
+            debug_print(f"      Sample prices: {[f'{p:.2f}' for p, v in curve[:3]]}")
+
         if not curve:
+            debug_print(f"   ❌ Agent {self.id}: Curve is EMPTY!")
             return None
 
         orders: List[Order] = []
 
+        # Erstelle Orders ohne Side zuerst
+        order_data = []
         for price, vol in curve:
             # Volumen innerhalb der Agenten-Grenzen halten
             volume = max(self.min_volume, min(self.max_volume, vol))
             if volume <= 0.0:
                 continue
-
-            side = Side.BUY if self.rng.random() < 0.5 else Side.SELL
-
+            
+            order_data.append((price, volume))
+        
+        if not order_data:
+            debug_print(f"   ❌ Agent {self.id}: order_data is EMPTY after filtering!")
+            return None
+        
+        debug_print(f"   ✅ Agent {self.id}: Created {len(order_data)} order_data entries")
+        
+        # Garantiere 50/50 Split zwischen BUY und SELL
+        n_orders_total = len(order_data)
+        n_buy = n_orders_total // 2
+        n_sell = n_orders_total - n_buy
+        
+        debug_print(f"   🎯 Agent {self.id}: Split → {n_buy} BUY, {n_sell} SELL")
+        
+        # Erstelle BUY Orders (erste Hälfte)
+        for i in range(n_buy):
+            price, volume = order_data[i]
             order = Order(
                 id=-1,
                 agent_id=self.id,
-                side=side,
+                side=Side.BUY,
                 price=price,
                 volume=volume,
                 product_id=0,
             )
             orders.append(order)
+        
+        # Erstelle SELL Orders (zweite Hälfte)
+        for i in range(n_buy, n_orders_total):
+            price, volume = order_data[i]
+            order = Order(
+                id=-1,
+                agent_id=self.id,
+                side=Side.SELL,
+                price=price,
+                volume=volume,
+                product_id=0,
+            )
+            orders.append(order)
+        
+        # Shuffle für Fairness (aber Side-Ratio bleibt 50/50)
+        self.rng.shuffle(orders)
+
+        debug_print(f"   ✅ Agent {self.id}: Returning {len(orders)} orders")
+        if orders:
+            buy_count = sum(1 for o in orders if o.side == Side.BUY)
+            sell_count = sum(1 for o in orders if o.side == Side.SELL)
+            debug_print(f"      Distribution: {buy_count} BUY, {sell_count} SELL")
 
         if not orders:
+            debug_print(f"   ❌ Agent {self.id}: Final orders list is EMPTY!")
             return None
 
         return orders
@@ -148,7 +232,7 @@ class RandomLiquidityAgent(Agent):
         
         Strategie:
         - Für jedes offene Produkt: Nutze gleiche Logik wie decide_order()
-        - Unabhängige zufällige Sides pro Produkt
+        - **GARANTIERT 50/50 Split zwischen BUY und SELL**
         - Liefert Liquidität auf beiden Seiten
         
         Args:
@@ -158,6 +242,8 @@ class RandomLiquidityAgent(Agent):
         Returns:
             Dict mapping product_id to List[Order]
         """
+        debug_print(f"\n🔍 DEBUG Agent {self.id} decide_orders() called at t={t} for {len(public_info)} products")
+        
         if not self.is_multi_product:
             # Fallback to single-product
             return super().decide_orders(t, public_info)
@@ -165,10 +251,15 @@ class RandomLiquidityAgent(Agent):
         all_orders = {}
         
         for product_id, pub_info in public_info.items():
+            debug_print(f"   📦 Agent {self.id} deciding for Product {product_id}...")
             orders = self._decide_for_product(t, product_id, pub_info)
             if orders:
                 all_orders[product_id] = orders
+                debug_print(f"      ✅ Added {len(orders)} orders for Product {product_id}")
+            else:
+                debug_print(f"      ❌ No orders for Product {product_id}")
         
+        debug_print(f"   📊 Agent {self.id} total: {len(all_orders)} products with orders")
         return all_orders
 
     def _decide_for_product(
@@ -182,6 +273,8 @@ class RandomLiquidityAgent(Agent):
         
         Nutzt die gleiche Logik wie decide_order(), aber mit product_id.
         
+        **WICHTIG: Garantiert 50/50 Split zwischen BUY und SELL Orders!**
+        
         Args:
             t: Current simulation time
             product_id: Product to trade
@@ -190,11 +283,16 @@ class RandomLiquidityAgent(Agent):
         Returns:
             List of Orders or None
         """
+        # DEBUG
+        debug_print(f"      🔍 _decide_for_product: Agent {self.id}, Product {product_id}")
+        
         # Fallback: wenn keine Strategy gesetzt ist, keine Aktivität
         if self.pricing_strategy is None:
+            debug_print(f"         ❌ pricing_strategy is None!")
             return None
 
         if self.n_orders <= 0:
+            debug_print(f"         ❌ n_orders={self.n_orders} <= 0")
             return None
 
         # Einfacher Ansatz: Gesamtvolumen = erwarteter Mittelwert aller Orders
@@ -202,9 +300,16 @@ class RandomLiquidityAgent(Agent):
         total_volume = avg_volume * self.n_orders
 
         if total_volume <= 0.0:
+            debug_print(f"         ❌ total_volume={total_volume} <= 0")
             return None
 
+        debug_print(f"         ✅ total_volume={total_volume:.2f}")
+
         # Die Preisstrategie erzeugt eine diskrete Price-Volume-Kurve.
+        debug_print(f"         📊 Calling build_price_volume_curve()...")
+        debug_print(f"            tob = {public_info.tob}")
+        debug_print(f"            da_price = {public_info.da_price}")
+        
         curve = self.pricing_strategy.build_price_volume_curve(
             agent=self,
             public_info=public_info,
@@ -212,31 +317,74 @@ class RandomLiquidityAgent(Agent):
             total_volume=total_volume,
         )
 
+        debug_print(f"         📈 Curve returned {len(curve) if curve else 0} price points")
+
         if not curve:
+            debug_print(f"         ❌ Curve is EMPTY!")
             return None
 
         orders: List[Order] = []
 
+        # Erstelle Orders ohne Side zuerst
+        order_data = []
         for price, vol in curve:
             # Volumen innerhalb der Agenten-Grenzen halten
             volume = max(self.min_volume, min(self.max_volume, vol))
             if volume <= 0.0:
                 continue
-
-            # Zufällige Side für dieses Produkt
-            side = Side.BUY if self.rng.random() < 0.5 else Side.SELL
-
+            
+            order_data.append((price, volume))
+        
+        if not order_data:
+            debug_print(f"         ❌ order_data is EMPTY after filtering!")
+            return None
+        
+        debug_print(f"         ✅ Created {len(order_data)} order_data entries")
+        
+        # Garantiere 50/50 Split zwischen BUY und SELL
+        n_orders_total = len(order_data)
+        n_buy = n_orders_total // 2
+        n_sell = n_orders_total - n_buy
+        
+        debug_print(f"         🎯 Split → {n_buy} BUY, {n_sell} SELL")
+        
+        # Erstelle BUY Orders (erste Hälfte)
+        for i in range(n_buy):
+            price, volume = order_data[i]
             order = Order(
                 id=-1,
                 agent_id=self.id,
-                side=side,
+                side=Side.BUY,
                 price=price,
                 volume=volume,
                 product_id=product_id,
             )
             orders.append(order)
+        
+        # Erstelle SELL Orders (zweite Hälfte)
+        for i in range(n_buy, n_orders_total):
+            price, volume = order_data[i]
+            order = Order(
+                id=-1,
+                agent_id=self.id,
+                side=Side.SELL,
+                price=price,
+                volume=volume,
+                product_id=product_id,
+            )
+            orders.append(order)
+        
+        # Shuffle für Fairness (aber Side-Ratio bleibt 50/50)
+        self.rng.shuffle(orders)
+
+        debug_print(f"         ✅ Returning {len(orders)} orders")
+        if orders:
+            buy_count = sum(1 for o in orders if o.side == Side.BUY)
+            sell_count = sum(1 for o in orders if o.side == Side.SELL)
+            debug_print(f"            Distribution: {buy_count} BUY, {sell_count} SELL")
 
         if not orders:
+            debug_print(f"         ❌ Final orders list is EMPTY!")
             return None
 
         return orders

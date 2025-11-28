@@ -6,19 +6,22 @@ Demonstriert die Multi-Product Simulation mit:
 - Multi-Product VariableAgents
 - Multi-Product RandomLiquidityAgents (liefern Liquidität!)
 - Visualisierung und Export
+- Duales Debug-System (Agent + Simulation)
 """
 
 from random import Random
 
 from intraday_abm.sim.multi_product_simulation import (
     run_multi_product_simulation,
-    print_simulation_summary
+    print_simulation_summary,
+    set_sim_debug_file,
+    close_sim_debug_file
 )
 from intraday_abm.core.product import create_hourly_products
 from intraday_abm.core.multi_product_private_info import MultiProductPrivateInfo
-from intraday_abm.core.types import AgentPrivateInfo
+from intraday_abm.core.types import AgentPrivateInfo, PublicInfo, TopOfBook, Side
 from intraday_abm.agents.variable import VariableAgent
-from intraday_abm.agents.random_liquidity import RandomLiquidityAgent
+from intraday_abm.agents.random_liquidity import RandomLiquidityAgent, set_debug_file, close_debug_file
 from intraday_abm.agents.pricing_strategies import NaivePricingStrategy
 
 import os
@@ -53,6 +56,7 @@ def demo_basic_multi_product():
     agents = []
     
     # --- Multi-Product Variable Agents (Wind farms) ---
+    print(f"\n👥 Creating VariableAgents:")
     for i in range(2):
         priv_info = MultiProductPrivateInfo.initialize(
             products=products,
@@ -68,9 +72,15 @@ def demo_basic_multi_product():
             base_volume=10.0,
             imbalance_tolerance=3.0
         )
+        
+        # Show forecasts
+        forecasts = [priv_info.forecasts[pid] for pid in range(3)]
+        print(f"   Agent {agent.id}: Forecasts = {forecasts}")
+        
         agents.append(agent)
     
     # --- Multi-Product RandomLiquidity Agents ---
+    print(f"\n👥 Creating RandomLiquidityAgents:")
     for i in range(3):
         priv_info = MultiProductPrivateInfo.initialize(
             products=products,
@@ -81,8 +91,8 @@ def demo_basic_multi_product():
             id=100 + i,
             private_info=priv_info,
             rng=Random(200 + i),
-            min_price=30.0,
-            max_price=70.0,
+            min_price=45.0,
+            max_price=55.0,
             min_volume=2.0,
             max_volume=8.0,
             n_orders=5
@@ -90,22 +100,39 @@ def demo_basic_multi_product():
         
         # Assign pricing strategy
         agent.pricing_strategy = NaivePricingStrategy(
-            pi_range=10.0,
-            n_segments=20,
-            min_price=30.0,
-            max_price=70.0,
+            pi_range=5.0,
+            n_segments=10,
+            min_price=45.0,
+            max_price=55.0,
             rng=Random(300 + i),
             n_orders=5
         )
         
+        # Test strategy
+        test_tob = TopOfBook(48.0, 10.0, 52.0, 10.0)
+        test_pub = PublicInfo(tob=test_tob, da_price=50.0)
+        test_curve = agent.pricing_strategy.build_price_volume_curve(
+            agent=agent,
+            public_info=test_pub,
+            side=Side.BUY,
+            total_volume=25.0
+        )
+        print(f"   Agent {agent.id}: Price Range [{agent.min_price:.1f}, {agent.max_price:.1f}], "
+              f"Strategy erzeugt {len(test_curve) if test_curve else 0} Preispunkte")
+        
         agents.append(agent)
     
-    print(f"\n👥 Agents created:")
-    print(f"   - {sum(1 for a in agents if isinstance(a, VariableAgent))} Multi-Product VariableAgents")
-    print(f"   - {sum(1 for a in agents if isinstance(a, RandomLiquidityAgent))} Multi-Product RandomLiquidityAgents")
+    print(f"\n📊 Total Agents: {len(agents)}")
+    
+    # Enable BOTH debug logs
+    os.makedirs("debug_logs", exist_ok=True)
+    set_debug_file("debug_logs/demo1_agent_debug.txt")
+    set_sim_debug_file("debug_logs/demo1_sim_debug.txt")
     
     # Run simulation
     print(f"\n▶️  Running simulation (200 steps)...")
+    print(f"   📝 Agent debug → debug_logs/demo1_agent_debug.txt")
+    print(f"   📝 Sim debug → debug_logs/demo1_sim_debug.txt")
     
     log, agent_logs, mo = run_multi_product_simulation(
         products=products,
@@ -115,8 +142,16 @@ def demo_basic_multi_product():
         verbose=True
     )
     
-    # Print summary
+    # Close BOTH debug files
+    close_debug_file()
+    close_sim_debug_file()
+    
+    # Print summary (without debug clutter)
     print_simulation_summary(log, agent_logs, mo)
+    
+    print(f"\n💾 Debug logs saved:")
+    print(f"   - debug_logs/demo1_agent_debug.txt")
+    print(f"   - debug_logs/demo1_sim_debug.txt")
     
     return log, agent_logs, mo
 
@@ -182,18 +217,18 @@ def demo_many_products():
             id=100 + i,
             private_info=priv_info,
             rng=Random(200 + i),
-            min_price=25.0,
-            max_price=75.0,
+            min_price=40.0,
+            max_price=60.0,
             min_volume=2.0,
             max_volume=10.0,
             n_orders=7
         )
         
         agent.pricing_strategy = NaivePricingStrategy(
-            pi_range=12.0,
-            n_segments=25,
-            min_price=25.0,
-            max_price=75.0,
+            pi_range=8.0,
+            n_segments=15,
+            min_price=40.0,
+            max_price=60.0,
             rng=Random(300 + i),
             n_orders=7
         )
@@ -277,18 +312,18 @@ def demo_minimal_test():
             id=100 + i,
             private_info=priv_info,
             rng=Random(200 + i),
-            min_price=35.0,
-            max_price=65.0,
+            min_price=48.0,    # Sehr eng!
+            max_price=52.0,
             min_volume=2.0,
             max_volume=6.0,
             n_orders=4
         )
         
         agent.pricing_strategy = NaivePricingStrategy(
-            pi_range=10.0,
-            n_segments=15,
-            min_price=35.0,
-            max_price=65.0,
+            pi_range=3.0,      # Sehr klein!
+            n_segments=8,
+            min_price=48.0,
+            max_price=52.0,
             rng=Random(300 + i),
             n_orders=4
         )
@@ -299,8 +334,14 @@ def demo_minimal_test():
     print(f"   - 1 VariableAgent (forecast=60, will SELL)")
     print(f"   - 2 RandomLiquidityAgents")
     
-    # Run simulation
+    # Enable debug for minimal test
+    os.makedirs("debug_logs", exist_ok=True)
+    set_debug_file("debug_logs/demo3_agent_debug.txt")
+    set_sim_debug_file("debug_logs/demo3_sim_debug.txt")
+    
     print(f"\n▶️  Running simulation (100 steps)...")
+    print(f"   📝 Agent debug → debug_logs/demo3_agent_debug.txt")
+    print(f"   📝 Sim debug → debug_logs/demo3_sim_debug.txt")
     
     log, agent_logs, mo = run_multi_product_simulation(
         products=products,
@@ -310,8 +351,14 @@ def demo_minimal_test():
         verbose=True
     )
     
-    # Print summary
+    close_debug_file()
+    close_sim_debug_file()
+    
     print_simulation_summary(log, agent_logs, mo)
+    
+    print(f"\n💾 Debug logs saved:")
+    print(f"   - debug_logs/demo3_agent_debug.txt")
+    print(f"   - debug_logs/demo3_sim_debug.txt")
     
     return log, agent_logs, mo
 
@@ -369,15 +416,16 @@ def main():
     
     print("\n" + "🚀"*35)
     print("   MULTI-PRODUCT INTRADAY MARKET SIMULATION DEMOS")
+    print("   (WITH DUAL DEBUG SYSTEM)")
     print("🚀"*35)
     
-    # Demo 1: Basic with Liquidity
+    # Demo 1: Basic with Liquidity (with FULL debug)
     log1, agent_logs1, mo1 = demo_basic_multi_product()
     
-    # Demo 2: Many Products
+    # Demo 2: Many Products (no debug to keep logs manageable)
     log2, agent_logs2, mo2 = demo_many_products()
     
-    # Demo 3: Minimal Test
+    # Demo 3: Minimal Test (with FULL debug)
     log3, agent_logs3, mo3 = demo_minimal_test()
     
     # Export results
@@ -393,7 +441,12 @@ def main():
     print(f"   - results/demo1_basic_liquidity.csv")
     print(f"   - results/demo2_many_products.csv")
     print(f"   - results/demo3_minimal.csv")
-    print(f"\n💡 Next: Run 'python plot_multi_product_results.py' to visualize!")
+    print(f"\n📝 Debug logs saved to:")
+    print(f"   - debug_logs/demo1_agent_debug.txt (Agent decisions)")
+    print(f"   - debug_logs/demo1_sim_debug.txt (Order processing)")
+    print(f"   - debug_logs/demo3_agent_debug.txt (Agent decisions)")
+    print(f"   - debug_logs/demo3_sim_debug.txt (Order processing)")
+    print(f"\n💡 Tip: Check demo1_sim_debug.txt to see why orders aren't matching!")
     print("="*70 + "\n")
 
 

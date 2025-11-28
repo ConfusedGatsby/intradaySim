@@ -16,6 +16,32 @@ from intraday_abm.core.multi_product_market_operator import MultiProductMarketOp
 from intraday_abm.core.order import Order
 
 
+# Global debug file handle
+_sim_debug_file = None
+
+
+def set_sim_debug_file(filepath: str):
+    """Set the simulation debug output file."""
+    global _sim_debug_file
+    _sim_debug_file = open(filepath, 'w', encoding='utf-8')
+
+
+def close_sim_debug_file():
+    """Close the simulation debug output file."""
+    global _sim_debug_file
+    if _sim_debug_file:
+        _sim_debug_file.close()
+        _sim_debug_file = None
+
+
+def sim_debug_print(msg: str):
+    """Print to simulation debug file if set, otherwise do nothing."""
+    global _sim_debug_file
+    if _sim_debug_file:
+        _sim_debug_file.write(msg + '\n')
+        _sim_debug_file.flush()
+
+
 def run_multi_product_simulation(
     products: List[Product],
     agents: List[Agent],
@@ -48,31 +74,6 @@ def run_multi_product_simulation(
         - market_log: Dict with keys ["t", "n_trades", "total_volume", "product_states", ...]
         - agent_logs: Dict[agent_id, Dict[str, List]] with per-agent tracking
         - market_operator: Final MultiProductMarketOperator state
-    
-    Example:
-        from intraday_abm.core.product import create_hourly_products
-        from intraday_abm.agents.variable import VariableAgent
-        from intraday_abm.core.multi_product_private_info import MultiProductPrivateInfo
-        
-        # Create products
-        products = create_hourly_products(n_hours=3)
-        
-        # Create multi-product agent
-        priv_info = MultiProductPrivateInfo.initialize(products, initial_capacity=100.0)
-        agent = VariableAgent(
-            id=1,
-            private_info=priv_info,
-            rng=Random(42),
-            base_forecast=50.0,
-            base_volume=10.0
-        )
-        
-        # Run simulation
-        log, agent_logs, mo = run_multi_product_simulation(
-            products=products,
-            agents=[agent],
-            n_steps=200
-        )
     """
     
     if seed is not None:
@@ -96,6 +97,14 @@ def run_multi_product_simulation(
         print(f"  - Single-Product: {sum(1 for a in agents if not a.is_multi_product)}")
         print(f"Steps: {n_steps}")
         print(f"{'='*60}\n")
+    
+    sim_debug_print("\n" + "="*60)
+    sim_debug_print("SIMULATION DEBUG LOG")
+    sim_debug_print("="*60)
+    sim_debug_print(f"Products: {len(products)}")
+    sim_debug_print(f"Agents: {len(agents)}")
+    sim_debug_print(f"Steps: {n_steps}")
+    sim_debug_print("="*60 + "\n")
     
     # Initialize logging
     market_log = {
@@ -136,25 +145,41 @@ def run_multi_product_simulation(
     # Main simulation loop
     for t in range(n_steps):
         
+        sim_debug_print(f"\n{'='*60}")
+        sim_debug_print(f"TIMESTEP t={t}")
+        sim_debug_print(f"{'='*60}")
+        
         # Update product statuses (handle gate closures)
         closed_products = mo.update_product_status(t)
         if closed_products and verbose and t % 50 == 0:
             print(f"  t={t}: Closed products {closed_products}")
         
+        if closed_products:
+            sim_debug_print(f"Closed products: {closed_products}")
+        
         # Get currently open products
         open_product_ids = mo.get_open_products(t)
+        
+        sim_debug_print(f"Open products: {open_product_ids}")
         
         if not open_product_ids:
             if verbose and t % 50 == 0:
                 print(f"  t={t}: No open products")
+            sim_debug_print("No open products - skipping")
             continue
         
         # Get public info for open products
         public_info = mo.get_public_info(t, product_ids=open_product_ids)
         
+        sim_debug_print(f"\nPublic Info:")
+        for pid, info in public_info.items():
+            sim_debug_print(f"  Product {pid}: tob={info.tob}, da_price={info.da_price}")
+        
         # Shuffle agent order for fairness
         agent_order = list(agents)
         rng.shuffle(agent_order)
+        
+        sim_debug_print(f"\nAgent order: {[a.id for a in agent_order]}")
         
         # Track trades this step
         step_trades = []
@@ -163,109 +188,152 @@ def run_multi_product_simulation(
         # Each agent decides and places orders
         for agent in agent_order:
             
+            sim_debug_print(f"\n--- Agent {agent.id} (is_multi_product={agent.is_multi_product}) ---")
+            
             if agent.is_multi_product:
                 # Multi-Product Agent: decide_orders()
+                sim_debug_print(f"Calling decide_orders() for Agent {agent.id}...")
+                
                 orders_dict = agent.decide_orders(t, public_info)
+                
+                sim_debug_print(f"Agent {agent.id} returned orders for {len(orders_dict)} products")
                 
                 # Process orders for each product
                 for product_id, order_or_list in orders_dict.items():
                     if product_id not in open_product_ids:
+                        sim_debug_print(f"  Product {product_id} not in open_product_ids - SKIPPING")
                         continue  # Skip closed products
                     
                     # Handle single order or list of orders
                     orders = order_or_list if isinstance(order_or_list, list) else [order_or_list]
                     
-                    for order in orders:
+                    sim_debug_print(f"  Product {product_id}: Processing {len(orders)} orders")
+                    
+                    for idx, order in enumerate(orders):
                         if order is None:
+                            sim_debug_print(f"    Order {idx}: None - SKIPPING")
                             continue
+                        
+                        sim_debug_print(f"    Order {idx}: Agent {order.agent_id}, {order.side.name}, "
+                                      f"{order.volume:.2f} MW @ {order.price:.2f} €, Product {order.product_id}")
                         
                         # Process order
                         try:
                             trades = mo.process_order(order, t, validate_time=True)
+                            
+                            sim_debug_print(f"      → Processed successfully, {len(trades)} trades generated")
                             
                             # Update agent state
                             for trade in trades:
                                 from intraday_abm.core.types import Side
                                 
                                 # Determine which side the agent was on
-                                if trade.buyer_id == agent.id:
+                                if trade.buy_agent_id == agent.id:
                                     agent.on_trade(
                                         volume=trade.volume,
                                         price=trade.price,
                                         side=Side.BUY,
                                         product_id=trade.product_id
                                     )
-                                elif trade.seller_id == agent.id:
+                                    sim_debug_print(f"      → Agent {agent.id} was BUYER in trade")
+                                elif trade.sell_agent_id == agent.id:
                                     agent.on_trade(
                                         volume=trade.volume,
                                         price=trade.price,
                                         side=Side.SELL,
                                         product_id=trade.product_id
                                     )
+                                    sim_debug_print(f"      → Agent {agent.id} was SELLER in trade")
                                 
                                 step_trades.append(trade)
                                 step_volume += trade.volume
                         
                         except ValueError as e:
                             # Product not open anymore
+                            sim_debug_print(f"      → ValueError: {e}")
                             if verbose and "not open" in str(e).lower():
                                 pass  # Silently ignore
                             else:
                                 if verbose:
                                     print(f"  Warning: {e}")
+                        except Exception as e:
+                            sim_debug_print(f"      → Exception: {type(e).__name__}: {e}")
+                            if verbose:
+                                print(f"  Warning: {type(e).__name__}: {e}")
             
             else:
                 # Single-Product Agent: fallback to decide_order()
                 # Use first open product
                 if not open_product_ids:
+                    sim_debug_print(f"Agent {agent.id}: No open products for single-product agent")
                     continue
                 
                 fallback_product_id = open_product_ids[0]
                 fallback_public_info = public_info[fallback_product_id]
                 
+                sim_debug_print(f"Calling decide_order() for Agent {agent.id} (fallback to Product {fallback_product_id})...")
+                
                 order_or_list = agent.decide_order(t, fallback_public_info)
                 
                 if order_or_list is None:
+                    sim_debug_print(f"Agent {agent.id} returned None")
                     continue
                 
                 # Handle single order or list of orders
                 orders = order_or_list if isinstance(order_or_list, list) else [order_or_list]
                 
-                for order in orders:
+                sim_debug_print(f"Agent {agent.id} returned {len(orders)} orders")
+                
+                for idx, order in enumerate(orders):
                     if order is None:
+                        sim_debug_print(f"  Order {idx}: None - SKIPPING")
                         continue
                     
                     # Set product_id if not set
                     if order.product_id is None or order.product_id == 0:
                         order.product_id = fallback_product_id
                     
+                    sim_debug_print(f"  Order {idx}: Agent {order.agent_id}, {order.side.name}, "
+                                  f"{order.volume:.2f} MW @ {order.price:.2f} €, Product {order.product_id}")
+                    
                     # Process order
                     try:
                         trades = mo.process_order(order, t, validate_time=True)
+                        
+                        sim_debug_print(f"    → Processed successfully, {len(trades)} trades generated")
                         
                         # Update agent state (single-product style)
                         for trade in trades:
                             from intraday_abm.core.types import Side
                             
-                            if trade.buyer_id == agent.id:
+                            if trade.buy_agent_id == agent.id:
                                 agent.on_trade(
                                     volume=trade.volume,
                                     price=trade.price,
                                     side=Side.BUY
                                 )
-                            elif trade.seller_id == agent.id:
+                                sim_debug_print(f"    → Agent {agent.id} was BUYER in trade")
+                            elif trade.sell_agent_id == agent.id:
                                 agent.on_trade(
                                     volume=trade.volume,
                                     price=trade.price,
                                     side=Side.SELL
                                 )
+                                sim_debug_print(f"    → Agent {agent.id} was SELLER in trade")
                             
                             step_trades.append(trade)
                             step_volume += trade.volume
                     
                     except ValueError as e:
+                        sim_debug_print(f"    → ValueError: {e}")
                         if verbose and "not open" not in str(e).lower():
                             print(f"  Warning: {e}")
+                    except Exception as e:
+                        sim_debug_print(f"    → Exception: {type(e).__name__}: {e}")
+                        if verbose:
+                            print(f"  Warning: {type(e).__name__}: {e}")
+        
+        sim_debug_print(f"\nStep {t} summary: {len(step_trades)} trades, {step_volume:.2f} MW")
         
         # Update imbalances for all agents and products
         for agent in agents:
@@ -328,6 +396,10 @@ def run_multi_product_simulation(
             print(f"  t={t:3d} | Open: {len(open_product_ids)} | "
                   f"Trades: {len(step_trades):3d} | Volume: {step_volume:6.1f} MW | "
                   f"Orders: {mo.total_orders():3d}")
+    
+    sim_debug_print("\n" + "="*60)
+    sim_debug_print("SIMULATION COMPLETE")
+    sim_debug_print("="*60)
     
     if verbose:
         print(f"\n{'='*60}")

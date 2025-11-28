@@ -1,0 +1,3000 @@
+
+🔍 DEBUG Agent 100 decide_orders() called at t=0 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=None, best_ask_volume=None)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=0 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=None, best_ask_volume=None)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=1 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=1 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=2 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=2 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=3 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=3 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=4 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=4 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=5 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=5 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=6 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=6 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=7 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=7 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=8 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=8 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=9 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=9 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=10 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=10 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=11 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=11 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=12 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=12 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=13 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=13 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=14 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=14 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=15 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=15 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=16 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=16 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=17 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=17 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=18 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=18 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=19 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=19 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=20 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=20 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=21 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=21 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=22 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=22 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=23 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=23 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=24 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=24 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=25 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=25 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=26 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=26 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=27 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=27 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=28 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=28 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=29 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=29 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=30 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=30 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=31 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=31 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=32 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=32 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=33 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=33 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=34 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=34 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=35 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=35 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=36 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=36 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=37 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=37 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=38 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=38 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=39 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=39 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=40 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=40 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=41 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=41 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=42 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=42 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=43 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=43 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=44 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=44 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=45 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=45 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=46 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=46 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=47 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=47 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=48 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=48 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=49 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=49 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=50 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=50 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=51 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=51 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=52 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=52 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=53 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=53 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=54 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=54 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=55 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=55 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=6.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=56 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=56 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=57 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=57 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=58 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=58 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=4.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=59 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=59 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=60 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=60 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=61 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=61 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=62 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=62 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=63 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=63 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=64 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=64 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=65 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=65 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=66 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=66 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=67 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=67 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=68 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=68 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=69 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=69 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=70 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=70 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=71 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=71 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=72 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=72 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=73 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=73 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=74 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=74 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=75 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=75 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=76 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=76 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=2.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=77 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=77 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=78 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=78 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=79 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=79 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=10.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=80 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=80 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=81 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=81 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=82 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=82 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=83 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=83 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=84 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=84 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=85 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=85 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=86 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=86 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=87 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=87 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=88 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=88 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=89 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=89 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=90 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=90 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=91 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=91 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=92 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=92 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=93 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=93 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=94 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=94 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=95 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=95 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=96 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=96 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=97 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=97 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=98 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=98 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
+
+🔍 DEBUG Agent 100 decide_orders() called at t=99 for 1 products
+   📦 Agent 100 deciding for Product 0...
+      🔍 _decide_for_product: Agent 100, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 100 total: 1 products with orders
+
+🔍 DEBUG Agent 101 decide_orders() called at t=99 for 1 products
+   📦 Agent 101 deciding for Product 0...
+      🔍 _decide_for_product: Agent 101, Product 0
+         ✅ total_volume=16.00
+         📊 Calling build_price_volume_curve()...
+            tob = TopOfBook(best_bid_price=None, best_bid_volume=None, best_ask_price=50.0, best_ask_volume=8.0)
+            da_price = 50.0
+         📈 Curve returned 8 price points
+         ✅ Created 8 order_data entries
+         🎯 Split → 4 BUY, 4 SELL
+         ✅ Returning 8 orders
+            Distribution: 4 BUY, 4 SELL
+      ✅ Added 8 orders for Product 0
+   📊 Agent 101 total: 1 products with orders
