@@ -11,7 +11,7 @@ Testet:
 
 from intraday_abm.agents.variable import VariableAgent
 from intraday_abm.core.types import AgentPrivateInfo, PublicInfo, TopOfBook, Side
-from intraday_abm.core.multi_product_private_info import MultiProductPrivateInfo
+from intraday_abm.core.types import MultiProductPrivateInfo
 from intraday_abm.core.product import create_hourly_products
 from random import Random
 

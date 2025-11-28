@@ -9,7 +9,7 @@ Testet:
 """
 
 from intraday_abm.core.product import create_hourly_products, create_single_product
-from intraday_abm.core.multi_product_private_info import MultiProductPrivateInfo
+from intraday_abm.core.types import MultiProductPrivateInfo
 
 
 def test_initialize():

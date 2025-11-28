@@ -10,7 +10,7 @@ Testet:
 
 from intraday_abm.sim.multi_product_simulation import run_multi_product_simulation, print_simulation_summary
 from intraday_abm.core.product import create_hourly_products, create_single_product
-from intraday_abm.core.multi_product_private_info import MultiProductPrivateInfo
+from intraday_abm.core.types import MultiProductPrivateInfo
 from intraday_abm.core.types import AgentPrivateInfo
 from intraday_abm.agents.variable import VariableAgent
 from random import Random

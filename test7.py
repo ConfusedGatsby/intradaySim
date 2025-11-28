@@ -9,7 +9,7 @@ Testet:
 """
 
 from intraday_abm.core.types import AgentPrivateInfo, PublicInfo, TopOfBook, Side
-from intraday_abm.core.multi_product_private_info import MultiProductPrivateInfo
+from intraday_abm.core.types import MultiProductPrivateInfo
 from intraday_abm.core.product import create_hourly_products
 from intraday_abm.core.order import Order
 from intraday_abm.agents.base import Agent

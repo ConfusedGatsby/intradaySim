@@ -12,7 +12,7 @@ from intraday_abm.agents.pricing_strategies import PricingStrategy
 # Import MultiProductPrivateInfo with TYPE_CHECKING to avoid circular imports
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from intraday_abm.core.multi_product_private_info import MultiProductPrivateInfo
+    from intraday_abm.core.types import MultiProductPrivateInfo
 
 
 @dataclass
