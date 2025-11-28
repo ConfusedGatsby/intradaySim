@@ -3,6 +3,11 @@ Multi-Product Simulation for Continuous Intraday Market.
 
 This module provides run_multi_product_simulation() which orchestrates
 trading across multiple delivery products with product lifecycle management.
+
+FIXED VERSION:
+- Counterparty agents (resting orders) now get on_trade() callbacks
+- Both buyer AND seller are updated for every trade
+- Fixes VariableAgent position/revenue tracking bug
 """
 
 from __future__ import annotations
@@ -45,68 +50,36 @@ def sim_debug_print(msg: str):
 def run_multi_product_simulation(
     products: List[Product],
     agents: List[Agent],
-    n_steps: int = 200,
-    seed: Optional[int] = None,
-    verbose: bool = True,
+    n_steps: int,
+    seed: int = 42,
+    verbose: bool = False
 ) -> tuple[Dict[str, List], Dict[int, Dict[str, List]], MultiProductMarketOperator]:
     """
     Run multi-product continuous intraday market simulation.
     
-    This function orchestrates trading across multiple delivery products,
-    managing product lifecycles (PENDING → OPEN → CLOSED → SETTLED) and
-    routing agent orders to the correct products.
-    
-    Features:
-    - Supports both multi-product and single-product agents (intelligent fallback)
-    - Product lifecycle management (gate opening/closing)
-    - Per-product logging
-    - Agent state tracking per product
-    
     Args:
-        products: List of Product instances to simulate
-        agents: List of Agent instances (can mix single and multi-product)
+        products: List of Product instances (delivery periods)
+        agents: List of Agent instances (traders)
         n_steps: Number of simulation steps
-        seed: Random seed for reproducibility
-        verbose: If True, print progress
+        seed: Random seed
+        verbose: Print progress output
         
     Returns:
         Tuple of (market_log, agent_logs, market_operator)
-        - market_log: Dict with keys ["t", "n_trades", "total_volume", "product_states", ...]
-        - agent_logs: Dict[agent_id, Dict[str, List]] with per-agent tracking
-        - market_operator: Final MultiProductMarketOperator state
     """
+    rng = Random(seed)
     
-    if seed is not None:
-        rng = Random(seed)
-    else:
-        rng = Random()
-    
-    # Initialize market operator
+    # Initialize market operator with proper order books
     mo = MultiProductMarketOperator.from_products(products)
+    # Update initial statuses (open products where gate_open has passed)
+    mo.update_product_status(t=0)
     
-    # Open all products at t=0 (for simplicity)
-    mo.open_products(t=0)
+    # ============================================================================
+    # FIX: Create agent lookup map for counterparty updates
+    # ============================================================================
+    agent_by_id = {ag.id: ag for ag in agents}
     
-    if verbose:
-        print(f"\n{'='*60}")
-        print(f"MULTI-PRODUCT SIMULATION")
-        print(f"{'='*60}")
-        print(f"Products: {len(products)}")
-        print(f"Agents: {len(agents)}")
-        print(f"  - Multi-Product: {sum(1 for a in agents if a.is_multi_product)}")
-        print(f"  - Single-Product: {sum(1 for a in agents if not a.is_multi_product)}")
-        print(f"Steps: {n_steps}")
-        print(f"{'='*60}\n")
-    
-    sim_debug_print("\n" + "="*60)
-    sim_debug_print("SIMULATION DEBUG LOG")
-    sim_debug_print("="*60)
-    sim_debug_print(f"Products: {len(products)}")
-    sim_debug_print(f"Agents: {len(agents)}")
-    sim_debug_print(f"Steps: {n_steps}")
-    sim_debug_print("="*60 + "\n")
-    
-    # Initialize logging
+    # Initialize logging dictionaries
     market_log = {
         "t": [],
         "n_trades": [],
@@ -124,9 +97,11 @@ def run_multi_product_simulation(
         market_log[f"p{pid}_status"] = []
     
     # Agent logging
-    agent_logs: Dict[int, Dict[str, List]] = {}
+    agent_logs = {}
     for agent in agents:
-        agent_logs[agent.id] = {
+        agent_log = {
+            "agent_id": agent.id,
+            "agent_type": agent.__class__.__name__,
             "t": [],
             "total_revenue": [],
             "total_position": [],
@@ -134,62 +109,74 @@ def run_multi_product_simulation(
             "n_orders_placed": [],
         }
         
-        # If multi-product, add per-product tracking
+        # Per-product state for multi-product agents
         if agent.is_multi_product:
             for product in products:
                 pid = product.product_id
-                agent_logs[agent.id][f"p{pid}_position"] = []
-                agent_logs[agent.id][f"p{pid}_revenue"] = []
-                agent_logs[agent.id][f"p{pid}_imbalance"] = []
+                agent_log[f"p{pid}_position"] = []
+                agent_log[f"p{pid}_revenue"] = []
+                agent_log[f"p{pid}_imbalance"] = []
+        
+        agent_logs[agent.id] = agent_log
+    
+    if verbose:
+        print("\n" + "="*60)
+        print("MULTI-PRODUCT SIMULATION")
+        print("="*60)
+        print(f"Products: {len(products)}")
+        print(f"Agents: {len(agents)}")
+        print(f"  - Multi-Product: {sum(1 for a in agents if a.is_multi_product)}")
+        print(f"  - Single-Product: {sum(1 for a in agents if not a.is_multi_product)}")
+        print(f"Steps: {n_steps}")
+        print("="*60)
+    
+    sim_debug_print("\n" + "="*60)
+    sim_debug_print("MULTI-PRODUCT SIMULATION START")
+    sim_debug_print("="*60)
+    sim_debug_print(f"Products: {len(products)}")
+    sim_debug_print(f"Agents: {len(agents)}")
+    sim_debug_print(f"Steps: {n_steps}")
     
     # Main simulation loop
     for t in range(n_steps):
-        
         sim_debug_print(f"\n{'='*60}")
-        sim_debug_print(f"TIMESTEP t={t}")
+        sim_debug_print(f"STEP {t}")
         sim_debug_print(f"{'='*60}")
         
-        # Update product statuses (handle gate closures)
+        # Update product lifecycle (open/close/settle)
         closed_products = mo.update_product_status(t)
-        if closed_products and verbose and t % 50 == 0:
+        if verbose and closed_products and t % 50 == 0:
             print(f"  t={t}: Closed products {closed_products}")
-        
         if closed_products:
             sim_debug_print(f"Closed products: {closed_products}")
         
         # Get currently open products
         open_product_ids = mo.get_open_products(t)
-        
-        sim_debug_print(f"Open products: {open_product_ids}")
-        
-        if not open_product_ids:
-            if verbose and t % 50 == 0:
-                print(f"  t={t}: No open products")
-            sim_debug_print("No open products - skipping")
-            continue
-        
-        # Get public info for open products
-        public_info = mo.get_public_info(t, product_ids=open_product_ids)
-        
-        sim_debug_print(f"\nPublic Info:")
-        for pid, info in public_info.items():
-            sim_debug_print(f"  Product {pid}: tob={info.tob}, da_price={info.da_price}")
-        
-        # Shuffle agent order for fairness
-        agent_order = list(agents)
-        rng.shuffle(agent_order)
-        
-        sim_debug_print(f"\nAgent order: {[a.id for a in agent_order]}")
+        sim_debug_print(f"\nOpen products: {open_product_ids}")
         
         # Track trades this step
         step_trades = []
         step_volume = 0.0
         
-        # Each agent decides and places orders
-        for agent in agent_order:
+        # Build public info for all open products
+        from intraday_abm.core.types import PublicInfo
+        
+        public_info = {}
+        for product_id in open_product_ids:
+            tob = mo.get_tob(product_id)
+            product = mo.products[product_id]
             
+            public_info[product_id] = PublicInfo(
+                tob=tob,
+                da_price=product.da_price,
+                product=product
+            )
+        
+        # Agent decision and order processing
+        for agent in agents:
             sim_debug_print(f"\n--- Agent {agent.id} (is_multi_product={agent.is_multi_product}) ---")
             
+            # Multi-Product or Single-Product?
             if agent.is_multi_product:
                 # Multi-Product Agent: decide_orders()
                 sim_debug_print(f"Calling decide_orders() for Agent {agent.id}...")
@@ -223,27 +210,33 @@ def run_multi_product_simulation(
                             
                             sim_debug_print(f"      → Processed successfully, {len(trades)} trades generated")
                             
-                            # Update agent state
+                            # ============================================================================
+                            # FIX: Update BOTH buyer AND seller (not just current agent)
+                            # ============================================================================
                             for trade in trades:
                                 from intraday_abm.core.types import Side
                                 
-                                # Determine which side the agent was on
-                                if trade.buy_agent_id == agent.id:
-                                    agent.on_trade(
+                                # Update BUYER (might be current agent OR resting order counterparty)
+                                buyer = agent_by_id.get(trade.buy_agent_id)
+                                if buyer:
+                                    buyer.on_trade(
                                         volume=trade.volume,
                                         price=trade.price,
                                         side=Side.BUY,
                                         product_id=trade.product_id
                                     )
-                                    sim_debug_print(f"      → Agent {agent.id} was BUYER in trade")
-                                elif trade.sell_agent_id == agent.id:
-                                    agent.on_trade(
+                                    sim_debug_print(f"      → Agent {trade.buy_agent_id} was BUYER in trade")
+                                
+                                # Update SELLER (might be current agent OR resting order counterparty)
+                                seller = agent_by_id.get(trade.sell_agent_id)
+                                if seller:
+                                    seller.on_trade(
                                         volume=trade.volume,
                                         price=trade.price,
                                         side=Side.SELL,
                                         product_id=trade.product_id
                                     )
-                                    sim_debug_print(f"      → Agent {agent.id} was SELLER in trade")
+                                    sim_debug_print(f"      → Agent {trade.sell_agent_id} was SELLER in trade")
                                 
                                 step_trades.append(trade)
                                 step_volume += trade.volume
@@ -302,24 +295,31 @@ def run_multi_product_simulation(
                         
                         sim_debug_print(f"    → Processed successfully, {len(trades)} trades generated")
                         
-                        # Update agent state (single-product style)
+                        # ============================================================================
+                        # FIX: Update BOTH buyer AND seller (not just current agent)
+                        # ============================================================================
                         for trade in trades:
                             from intraday_abm.core.types import Side
                             
-                            if trade.buy_agent_id == agent.id:
-                                agent.on_trade(
+                            # Update BUYER
+                            buyer = agent_by_id.get(trade.buy_agent_id)
+                            if buyer:
+                                buyer.on_trade(
                                     volume=trade.volume,
                                     price=trade.price,
                                     side=Side.BUY
                                 )
-                                sim_debug_print(f"    → Agent {agent.id} was BUYER in trade")
-                            elif trade.sell_agent_id == agent.id:
-                                agent.on_trade(
+                                sim_debug_print(f"    → Agent {trade.buy_agent_id} was BUYER in trade")
+                            
+                            # Update SELLER
+                            seller = agent_by_id.get(trade.sell_agent_id)
+                            if seller:
+                                seller.on_trade(
                                     volume=trade.volume,
                                     price=trade.price,
                                     side=Side.SELL
                                 )
-                                sim_debug_print(f"    → Agent {agent.id} was SELLER in trade")
+                                sim_debug_print(f"    → Agent {trade.sell_agent_id} was SELLER in trade")
                             
                             step_trades.append(trade)
                             step_volume += trade.volume
@@ -402,14 +402,14 @@ def run_multi_product_simulation(
     sim_debug_print("="*60)
     
     if verbose:
-        print(f"\n{'='*60}")
-        print(f"SIMULATION COMPLETE")
-        print(f"{'='*60}")
         total_trades = sum(market_log["n_trades"])
-        total_vol = sum(market_log["total_volume"])
+        total_volume = sum(market_log["total_volume"])
+        print("\n" + "="*60)
+        print("SIMULATION COMPLETE")
+        print("="*60)
         print(f"Total Trades: {total_trades}")
-        print(f"Total Volume: {total_vol:.1f} MW")
-        print(f"{'='*60}\n")
+        print(f"Total Volume: {total_volume:.1f} MW")
+        print("="*60)
     
     return market_log, agent_logs, mo
 
@@ -418,20 +418,20 @@ def print_simulation_summary(
     market_log: Dict[str, List],
     agent_logs: Dict[int, Dict[str, List]],
     mo: MultiProductMarketOperator
-):
+) -> None:
     """
-    Print summary statistics from multi-product simulation.
+    Print summary statistics from simulation results.
     
     Args:
-        market_log: Market log from run_multi_product_simulation
-        agent_logs: Agent logs from run_multi_product_simulation
-        mo: Market operator from run_multi_product_simulation
+        market_log: Market-level log dictionary
+        agent_logs: Agent-level log dictionaries
+        mo: Market operator instance
     """
     print("\n" + "="*60)
     print("SIMULATION SUMMARY")
     print("="*60)
     
-    # Market stats
+    # Market statistics
     total_trades = sum(market_log["n_trades"])
     total_volume = sum(market_log["total_volume"])
     avg_trades_per_step = total_trades / len(market_log["t"]) if market_log["t"] else 0
@@ -441,20 +441,34 @@ def print_simulation_summary(
     print(f"  Total Volume: {total_volume:.1f} MW")
     print(f"  Avg Trades/Step: {avg_trades_per_step:.2f}")
     
-    # Per-product stats
+    # Per-product statistics (show sample)
     print(f"\nPer-Product Statistics:")
-    for pid in range(len(mo.products)):
-        if f"p{pid}_trades" in market_log:
-            p_trades = sum(market_log[f"p{pid}_trades"])
-            p_volume = sum(market_log[f"p{pid}_volume"])
-            print(f"  Product {pid}: {p_trades} trades, {p_volume:.1f} MW")
+    products = list(mo.products.values())
     
-    # Agent stats
+    # Show first 10 products or all if fewer
+    sample_products = products[:min(10, len(products))]
+    
+    for product in sample_products:
+        pid = product.product_id
+        product_trades = market_log[f"p{pid}_trades"][-1] if f"p{pid}_trades" in market_log else 0
+        product_volume = market_log[f"p{pid}_volume"][-1] if f"p{pid}_volume" in market_log else 0.0
+        
+        product_name = product.name if hasattr(product, 'name') and product.name else f"Product {pid}"
+        print(f"  {product_name}: {product_trades} trades, {product_volume:.1f} MW")
+    
+    if len(products) > 10:
+        print(f"  ... and {len(products) - 10} more products")
+    
+    # Agent statistics
     print(f"\nAgent Statistics:")
-    for agent_id, log in agent_logs.items():
-        if log["total_revenue"]:
-            final_revenue = log["total_revenue"][-1]
-            final_position = log["total_position"][-1]
-            print(f"  Agent {agent_id}: Revenue={final_revenue:.2f} €, Position={final_position:.2f} MW")
+    for agent_id, agent_log in agent_logs.items():
+        if not agent_log["t"]:
+            continue
+        
+        final_revenue = agent_log["total_revenue"][-1]
+        final_position = agent_log["total_position"][-1]
+        agent_type = agent_log["agent_type"]
+        
+        print(f"  Agent {agent_id}: Revenue={final_revenue:.2f} €, Position={final_position:.2f} MW")
     
     print("="*60)
