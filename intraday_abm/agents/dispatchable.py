@@ -7,18 +7,20 @@ This is the COMPLETE modified DispatchableAgent class with:
 - Shinde 2023 Equations 18-21 (Ramping Constraints, Switch Parameter)
 - Multi-Product Support
 - Full compatibility with existing codebase
-
-Replace the existing DispatchableAgent class (lines 4148-4339) with this code.
 """
 
-from dataclasses import dataclass, field
-from typing import Optional, Dict, Union, Tuple
-from enum import Enum
+from __future__ import annotations
 
-# Assuming these imports from your existing code:
-# from intraday_abm.core.agent import Agent
-# from intraday_abm.core.order import Order, Side, TimeInForce
-# from intraday_abm.core.public_info import PublicInfo
+from dataclasses import dataclass, field
+from typing import Optional, Dict, Union, Tuple, List
+from enum import Enum
+from random import Random
+
+# Correct imports based on actual project structure
+from intraday_abm.agents.base import Agent
+from intraday_abm.core.order import Order, Side, TimeInForce
+from intraday_abm.core.types import PublicInfo, AgentPrivateInfo, MultiProductPrivateInfo
+from intraday_abm.agents.pricing_strategies import PricingStrategy
 
 
 @dataclass
@@ -231,72 +233,41 @@ class DispatchableAgent(Agent):
         are constrained in buying, but can always sell if profitable).
         
         Args:
-            delta: Current imbalance
-            product_id: Product ID (for multi-product)
+            delta: Imbalance from _compute_imbalance_shinde()
+            product_id: Product identifier (for multi-product)
         """
-        pi = self.private_info
+        if not hasattr(self.private_info, 'limit_buy_initial'):
+            return
         
-        # Get current limit buy price for this product
-        if self.is_multi_product:
-            # Multi-product: limit_buy is a dict
-            if not hasattr(pi, 'limit_buy') or not isinstance(pi.limit_buy, dict):
-                pi.limit_buy = {}
-            
-            l_buy_current = pi.limit_buy.get(product_id, pi.limit_buy_initial)
-            l_buy_init = pi.limit_buy_initial
-        else:
-            # Single-product: limit_buy is a float
-            l_buy_current = getattr(pi, 'limit_buy', pi.limit_buy_initial)
-            l_buy_init = pi.limit_buy_initial
-        
-        # Predict imbalance prices (Shinde 2021 Equations 4-5)
-        # π̂_imb- = π_imb- + N(0, e_imb)
-        pi_imb_minus_hat = self.pi_imb_minus + self.rng.gauss(0, self.e_imb)
-        
-        # Update l_buy if delta < 0 (Equation 11)
         if delta < 0:
-            # Agent needs to BUY → increase willingness to pay
-            l_buy_new = (1 - self.alpha) * l_buy_current + \
-                       self.alpha * max(pi_imb_minus_hat, l_buy_init)
+            # Undercommitted → need to buy → adjust buy limit up
+            pi_imb_forecast = self.pi_imb_minus + self.rng.uniform(-self.e_imb, self.e_imb)
+            new_limit = (1 - self.alpha) * self.private_info.limit_buy + \
+                       self.alpha * max(pi_imb_forecast, self.private_info.limit_buy_initial)
+            self.private_info.limit_buy = new_limit
         else:
-            # Agent is OK → reset to initial
-            l_buy_new = l_buy_init
+            # OK or overcommitted → reset to initial
+            self.private_info.limit_buy = self.private_info.limit_buy_initial
         
-        # Store updated limit price
-        if self.is_multi_product:
-            pi.limit_buy[product_id] = l_buy_new
-        else:
-            pi.limit_buy = l_buy_new
-        
-        # l_sell NEVER changes (Equation 12)
-        # It stays at initial value (already set in private_info)
+        # Sell limit NEVER changes (Equation 12)
+        self.private_info.limit_sell = self.private_info.limit_sell_initial
     
     # ========== SHINDE 2023 SWITCH LOGIC ==========
     
-    def _check_switch_activation(self, t: int) -> bool:
+    def _check_switch_activation(self, t: int) -> None:
         """
-        Check if switch should be activated.
+        Check if switch should activate at current timestep.
         
-        Switch activates at: t_switch = switch_parameter * T_total
-        
-        Example:
-        - switch_parameter = 0.5, T_total = 1500
-        - Switch activates at t = 750 (50% of timeline)
+        Switch activates when: t >= switch_parameter × total_steps
         
         Args:
             t: Current timestep
-            
-        Returns:
-            True if switch is activated
         """
         switch_step = int(self.switch_parameter * self._total_trading_steps)
-        
         if t >= switch_step and not self._switch_activated:
             self._switch_activated = True
-        
-        return self._switch_activated
     
-    # ========== SHINDE 2023 TRADING MODES ==========
+    # ========== TRADING MODES ==========
     
     def _create_profit_order(
         self,
@@ -304,53 +275,43 @@ class DispatchableAgent(Agent):
         product_id: int,
         public_info: PublicInfo,
         capacity: float,
-        position: float,
+        position: float
     ) -> Optional[Order]:
         """
-        Shinde 2023 Equations 18-19 (BEFORE switch).
+        Shinde 2023 Equations 18-19: Profit Maximization Mode (BEFORE switch).
         
-        Profit maximization mode:
-        - Trade if profitable (price vs. marginal cost)
-        - Volume limited by ramping rates
+        v̂_A = min{C - p_mar, ν·r_up}                           # Sell volume
+        v̂_B = min{max{p_mar - min(C, C_min), 0}, ν·r_dn}      # Buy volume
         
-        Equations 18-19:
-        v̂_A = min{C - p_mar, ν·r_up}      # Sell volume
-        v̂_B = min{max{p_mar - min(C, C_min), 0}, ν·r_dn}  # Buy volume
+        Trade if profitable based on marginal cost vs. market price.
         
         Args:
             t: Current timestep
-            product_id: Product ID
-            public_info: Public market info
+            product_id: Product identifier
+            public_info: Public market information
             capacity: Agent capacity
             position: Current position
             
         Returns:
             Order or None
         """
-        # Get midprice
-        mid = self._get_midprice(public_info.tob, public_info.da_price)
+        # Get market price estimate
+        mid_price = self._get_midprice(public_info.tob, public_info.da_price)
         
-        # Equation 18: Sell volume
-        v_A = min(
-            capacity - position,
-            self.nu_R * self.ramping_up_rate
-        )
-        
-        # Equation 19: Buy volume
+        # Equations 18-19: Calculate potential volumes
+        v_A = min(capacity - position, self.nu_R * self.ramping_up_rate)      # Sell
         v_B = min(
             max(position - min(capacity, self.min_stable_load), 0.0),
             self.nu_R * self.ramping_down_rate
-        )
+        )  # Buy
         
-        # Profitability check
-        can_sell = (mid > self.marginal_cost + self.epsilon_price) and (v_A > 0)
-        can_buy = (mid < self.marginal_cost - self.epsilon_price) and (v_B > 0)
-        
-        # Decide side
-        if can_sell:
+        # Decide based on profitability
+        if mid_price > self.marginal_cost + self.epsilon_price and v_A > 0:
+            # Price high enough → SELL
             side = Side.SELL
             volume = min(v_A, self.base_volume)
-        elif can_buy:
+        elif mid_price < self.marginal_cost - self.epsilon_price and v_B > 0:
+            # Price low enough → BUY
             side = Side.BUY
             volume = min(v_B, self.base_volume)
         else:
@@ -358,11 +319,9 @@ class DispatchableAgent(Agent):
         
         # Compute price using pricing strategy
         price = self.compute_order_price(
-            side=side,
-            t=t,
             public_info=public_info,
-            volume=volume,
-            product_id=product_id if self.is_multi_product else None
+            side=side,
+            volume=volume
         )
         
         return Order(
@@ -382,42 +341,37 @@ class DispatchableAgent(Agent):
         product_id: int,
         public_info: PublicInfo,
         capacity: float,
-        position: float,
+        position: float
     ) -> Optional[Order]:
         """
-        Shinde 2023 Equations 20-21 (AFTER switch).
+        Shinde 2023 Equations 20-21: Ramping Compliance Mode (AFTER switch).
         
-        Ramping compliance mode:
-        - Calculate ramping violations
-        - Trade to fix violations
-        
-        Equations 20-21:
-        If δ < 0 (ramping down too fast):
-            v̂_A = 0, v̂_B = max{r_dn, |δ|}
-        If δ > 0 (ramping up too fast):
-            v̂_A = max{r_up, |δ|}, v̂_B = 0
-        Else (no violation):
-            v̂_A = min{p_mar - C, ν·r_up}
-            v̂_B = min{max{p_mar - min(C, C_min), 0}, ν·r_dn}
+        When δ < 0 (ramping down too fast):
+          v̂_A = 0, v̂_B = max{r_dn, |δ|}
+        When δ > 0 (ramping up too fast):
+          v̂_A = max{r_up, |δ|}, v̂_B = 0
+        Otherwise (no violation):
+          v̂_A = min{p_mar - C, ν·r_up}
+          v̂_B = min{max{p_mar - min(C, C_min), 0}, ν·r_dn}
         
         Args:
             t: Current timestep
-            product_id: Product ID
-            public_info: Public market info
+            product_id: Product identifier
+            public_info: Public market information
             capacity: Agent capacity
             position: Current position
             
         Returns:
             Order or None
         """
-        # Calculate ramping violation δ_i,t,d
+        # Calculate ramping violation across products
         delta_ramp = self._calculate_ramping_violation(product_id)
         
         # Equation 20: Sell volume decision
-        if delta_ramp < 0:  # Ramping down too fast
-            v_A = 0.0
-        elif delta_ramp > 0:  # Ramping up too fast
+        if delta_ramp > 0:  # Ramping up too fast
             v_A = max(self.ramping_up_rate, abs(delta_ramp))
+        elif delta_ramp < 0:  # Ramping down too fast
+            v_A = 0.0
         else:  # No violation
             v_A = min(
                 position - capacity,  # Note: This should be capacity - position?
@@ -456,11 +410,9 @@ class DispatchableAgent(Agent):
         
         # Compute price
         price = self.compute_order_price(
-            side=side,
-            t=t,
             public_info=public_info,
-            volume=volume,
-            product_id=product_id if self.is_multi_product else None
+            side=side,
+            volume=volume
         )
         
         return Order(
@@ -624,9 +576,7 @@ class DispatchableAgent(Agent):
         if min_stable_load is None:
             min_stable_load = capacity * 0.25
         
-        # Create private info (assuming AgentPrivateInfo exists)
-        from intraday_abm.core.private_info import AgentPrivateInfo
-        
+        # Create private info
         priv = AgentPrivateInfo(
             effective_capacity=capacity,
             da_position=da_position,
