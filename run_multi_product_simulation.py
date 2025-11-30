@@ -30,7 +30,7 @@ from typing import List, Dict
 
 from intraday_abm.sim.multi_product_simulation import run_multi_product_simulation
 from intraday_abm.core.product import create_quarterly_products, print_quarterly_products_summary
-from intraday_abm.config_params.demo4_config import DEFAULT_DEMO4_CONFIG, Demo4Config
+from intraday_abm.config_params.multi_product_config import DEFAULT_DEMO4_CONFIG, Demo4Config
 from intraday_abm.utils.logging import setup_logger, SimulationLogger
 
 # Agent imports

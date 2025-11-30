@@ -16,7 +16,7 @@ import os
 from typing import Dict, Any, List
 
 from intraday_abm.config_params import DEFAULT_CONFIG, SimulationConfig
-from intraday_abm.sim.simulation import run_demo
+from intraday_abm.sim.single_product_simulation import run_demo
 from intraday_abm.sim.export_utils import save_log_to_csv
 from intraday_abm.sim.export_agent_logs import save_agent_logs
 from intraday_abm.sim.plot_results import plot_results
