@@ -20,7 +20,7 @@ Usage:
 
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Literal, Optional, List
 
 
 @dataclass
@@ -37,8 +37,8 @@ class Demo4Config:
     """
     
     # ========== SIMULATION RUNTIME ==========
-    n_steps: int = 1500
-    """Total simulation steps (should be >= 96*4 for full product lifecycle)"""
+    n_steps: Optional[int] = None
+    """Total simulation steps. If None, automatically calculated to run until all product gates are closed."""
     
     seed: int = 42
     """Random seed for reproducibility"""
@@ -398,6 +398,35 @@ class Demo4Config:
             }
         }
     
+    def calculate_n_steps_from_products(self, products: List) -> int:
+        """
+        Calculate n_steps based on product gate closures.
+        
+        This ensures the simulation runs until ALL product gates are closed,
+        which is required for complete settlement.
+        
+        Args:
+            products: List of Product instances
+            
+        Returns:
+            Number of steps needed (last gate closure + 1 for final settlement)
+            
+        Example:
+            >>> config = Demo4Config(n_steps=None)
+            >>> products = create_quarterly_products(96, 45.0, 'winter')
+            >>> n_steps = config.calculate_n_steps_from_products(products)
+            >>> print(f"Required steps: {n_steps}")  # Should be ~2861
+        """
+        if not products:
+            # Fallback to configured value or default
+            return self.n_steps if self.n_steps is not None else 1500
+        
+        # Find the latest gate closure time
+        last_gate_closure = max(p.gate_close for p in products)
+        
+        # Add 1 step for final settlement processing
+        return last_gate_closure + 1
+    
     def print_summary(self):
         """Print a human-readable summary of the configuration"""
         print("\n" + "="*70)
@@ -419,7 +448,8 @@ class Demo4Config:
         print(f"   Total:                 {self.total_agents}")
         
         print(f"\n⚙️  SIMULATION:")
-        print(f"   Steps:                 {self.n_steps}")
+        n_steps_display = self.n_steps if self.n_steps is not None else "Auto (until all gates closed)"
+        print(f"   Steps:                 {n_steps_display}")
         print(f"   Seed:                  {self.seed}")
         print(f"   Verbose:               {self.verbose}")
         
@@ -439,7 +469,7 @@ class Demo4Config:
 # This is the RECOMMENDED configuration for standard simulations
 DEFAULT_DEMO4_CONFIG = Demo4Config(
     # Simulation Runtime
-    n_steps=1500,
+    n_steps=None,  # Auto-calculate: Run until all product gates are closed
     seed=42,
     verbose=True,
     

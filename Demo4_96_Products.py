@@ -430,7 +430,8 @@ def run_demo4(config: Optional[Demo4Config] = None):
         logger.info("Agents: %d Variable, %d Random Liquidity, %d Thermal (Total: %d)",
                    config.n_variable_agents, config.n_random_liquidity_agents,
                    config.n_thermal_agents, config.total_agents)
-        logger.info("Simulation: %d steps, Seed: %d", config.n_steps, config.seed)
+        n_steps_log = config.n_steps if config.n_steps is not None else "Auto (calculated from products)"
+        logger.info("Simulation: %s steps, Seed: %d", n_steps_log, config.seed)
         logger.info("Output: %s, CSV Export: %s", config.results_dir, config.export_csv)
         logger.info("="*70)
     else:
@@ -458,6 +459,25 @@ def run_demo4(config: Optional[Demo4Config] = None):
     print("QUARTERLY PRODUCTS SUMMARY")
     print("="*70)
     print_quarterly_products_summary(products)
+    
+    # ========== CALCULATE N_STEPS FROM PRODUCTS (OPTION B) ==========
+    # If n_steps is None, calculate it to ensure simulation runs until
+    # ALL product gates are closed (required for complete settlement)
+    if config.n_steps is None:
+        n_steps = config.calculate_n_steps_from_products(products)
+        if logger:
+            logger.info("Auto-calculated n_steps from products: %d", n_steps)
+        print(f"\n⏰ Simulation Timeline:")
+        print(f"   Gate Opening:      t=0")
+        print(f"   Last Gate Closure: t={n_steps - 1}")
+        print(f"   Total Steps:       {n_steps} (auto-calculated)")
+        print(f"   Expected Duration: ~{n_steps / 60:.1f} hours of trading")
+    else:
+        n_steps = config.n_steps
+        if logger:
+            logger.info("Using configured n_steps: %d", n_steps)
+        print(f"\n⏰ Simulation Timeline:")
+        print(f"   Total Steps:       {n_steps} (configured)")
     
     # Create agents
     if logger:
@@ -498,14 +518,14 @@ def run_demo4(config: Optional[Demo4Config] = None):
     print("="*70)
     
     if sim_logger:
-        sim_logger.simulation_start(config.n_steps, len(agents), len(products))
+        sim_logger.simulation_start(n_steps, len(agents), len(products))
     
     start_time = time.time()
     
     log, agent_logs, mo = run_multi_product_simulation(
         products=products,
         agents=agents,
-        n_steps=config.n_steps,
+        n_steps=n_steps,  # Use calculated n_steps
         seed=config.seed,
         verbose=config.verbose
     )
