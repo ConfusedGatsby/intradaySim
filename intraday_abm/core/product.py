@@ -50,7 +50,7 @@ class Product:
         gate_open: Time when trading begins for this product
         gate_close: Time when trading ends for this product
         duration: Length of delivery period in minutes (15, 30, or 60)
-        da_price: Day-ahead market clearing price for this product (€/MWh)
+        da_price: Day-ahead market clearing price for this product (EUR/MWh)
         status: Current lifecycle status
         name: Optional human-readable name (e.g., "H00", "H12Q3")
     
@@ -222,17 +222,17 @@ def generate_realistic_da_price(
         hour: Hour (0-23)
         quarter: Quarter (0-3 for Q1-Q4)
         season: 'summer' or 'winter'
-        base_price: Base price in €/MWh (default 45.0)
-        volatility: Stochastic volatility in €/MWh (default 5.0)
+        base_price: Base price in EUR/MWh (default 45.0)
+        volatility: Stochastic volatility in EUR/MWh (default 5.0)
         rng: NumPy random generator (optional)
         
     Returns:
-        DA price in €/MWh
+        DA price in EUR/MWh
         
     Example:
         >>> price = generate_realistic_da_price(hour=12, quarter=0, season='winter')
-        >>> print(f"H12Q1 Winter: {price:.2f} €/MWh")
-        H12Q1 Winter: 52.34 €/MWh
+        >>> print(f"H12Q1 Winter: {price:.2f} EUR/MWh")
+        H12Q1 Winter: 52.34 EUR/MWh
     """
     if rng is None:
         rng = np.random.default_rng()
@@ -445,8 +445,8 @@ def create_quarterly_products(
         gate_open_offset_hours: Gate opens X hours before delivery (default 24)
         gate_close_offset_minutes: Gate closes X min before delivery (default 5)
         season: 'summer' or 'winter' for seasonal price patterns
-        base_da_price: Base Day-Ahead price in €/MWh (default 45.0)
-        price_volatility: Stochastic volatility in €/MWh (default 5.0)
+        base_da_price: Base Day-Ahead price in EUR/MWh (default 45.0)
+        price_volatility: Stochastic volatility in EUR/MWh (default 5.0)
         add_stochastic_volatility: Whether to add random variation
         seed: Random seed for reproducibility
         
@@ -464,7 +464,7 @@ def create_quarterly_products(
         
         # Check product details
         for p in products[:4]:
-            print(f"{p.name}: DA={p.da_price:.2f} €/MWh")
+            print(f"{p.name}: DA={p.da_price:.2f} EUR/MWh")
     """
     rng = np.random.default_rng(seed) if seed is not None else np.random.default_rng()
     
@@ -574,18 +574,18 @@ def print_quarterly_products_summary(products: List[Product]) -> None:
     print("QUARTERLY PRODUCTS SUMMARY")
     print("="*70)
     
-    print(f"\n📦 Total Products: {len(products)}")
+    print(f"\nTotal Products: {len(products)}")
     
     # DA Price statistics
     da_prices = [p.da_price for p in products]
-    print(f"\n💰 DA PRICE STATISTICS:")
-    print(f"   Min:     {min(da_prices):.2f} €/MWh")
-    print(f"   Max:     {max(da_prices):.2f} €/MWh")
-    print(f"   Mean:    {np.mean(da_prices):.2f} €/MWh")
-    print(f"   Std Dev: {np.std(da_prices):.2f} €/MWh")
+    print(f"\nDA PRICE STATISTICS:")
+    print(f"   Min:     {min(da_prices):.2f} EUR/MWh")
+    print(f"   Max:     {max(da_prices):.2f} EUR/MWh")
+    print(f"   Mean:    {np.mean(da_prices):.2f} EUR/MWh")
+    print(f"   Std Dev: {np.std(da_prices):.2f} EUR/MWh")
     
     # Sample products
-    print(f"\n📋 SAMPLE PRODUCTS:")
+    print(f"\nSAMPLE PRODUCTS:")
     if len(products) >= 96:
         sample_indices = [0, 12, 48, 72, 95]  # H00Q1, H03Q1, H12Q1, H18Q1, H23Q4
     else:
@@ -596,24 +596,24 @@ def print_quarterly_products_summary(products: List[Product]) -> None:
             p = products[idx]
             name_str = p.name if p.name else f"P{p.product_id}"
             print(f"   {name_str}: Delivery {p.delivery_start}-{p.delivery_end} min, "
-                  f"DA={p.da_price:.2f} €/MWh, Gate {p.gate_open}-{p.gate_close}")
+                  f"DA={p.da_price:.2f} EUR/MWh, Gate {p.gate_open}-{p.gate_close}")
     
     # Hourly averages (if we have 96 products)
     if len(products) == 96:
-        print(f"\n📊 HOURLY AVERAGE DA PRICES:")
+        print(f"\nHOURLY AVERAGE DA PRICES:")
         for hour in [0, 6, 12, 18, 23]:
             hour_products = [p for p in products if hour * 4 <= p.product_id < (hour + 1) * 4]
             if hour_products:
                 avg_price = np.mean([p.da_price for p in hour_products])
-                print(f"   H{hour:02d}: {avg_price:.2f} €/MWh (Q1-Q4 average)")
+                print(f"   H{hour:02d}: {avg_price:.2f} EUR/MWh (Q1-Q4 average)")
         
         # Peak vs Off-Peak
         peak_products = [p for p in products if 8 * 4 <= p.product_id < 20 * 4]
         off_peak_products = [p for p in products if p.product_id < 8 * 4 or p.product_id >= 20 * 4]
         
         if peak_products and off_peak_products:
-            print(f"\n⚡ PEAK vs OFF-PEAK:")
-            print(f"   Peak (H08-H19):    {np.mean([p.da_price for p in peak_products]):.2f} €/MWh")
-            print(f"   Off-Peak (H00-H07, H20-H23): {np.mean([p.da_price for p in off_peak_products]):.2f} €/MWh")
+            print(f"\nPEAK vs OFF-PEAK:")
+            print(f"   Peak (H08-H19):    {np.mean([p.da_price for p in peak_products]):.2f} EUR/MWh")
+            print(f"   Off-Peak (H00-H07, H20-H23): {np.mean([p.da_price for p in off_peak_products]):.2f} EUR/MWh")
     
     print("\n" + "="*70)
